@@ -1,8 +1,10 @@
 package com.teammimosa.pupalert_android;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -11,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import android.location.LocationListener;
+
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,9 +24,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener
+/**
+ * The activity for our map viewer.
+ * @author Domenic Portuesi
+ */
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, LocationListener
 {
     private GoogleMap mMap;
+    private LocationManager locationManager;
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
 
     /**
      * Request code for location permission request.
@@ -35,8 +47,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean mPermissionDenied = false;
-
-    private FusedLocationProviderClient locationAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,20 +66,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.setOnMyLocationButtonClickListener(this);
         enableMyLocation();
-
-        //TODO Figure out why camera pan to cur loc is not working
-        /*
-        if(map != null)
-        {
-            //get location
-            Task<Location> loc = locationAPI.getLastLocation();
-            double latitude = loc.getResult().getLatitude();
-            double longitude = loc.getResult().getLongitude();
-
-            LatLng userLoc = new LatLng(latitude, longitude);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(userLoc));
-        }
-        */
     }
 
     /**
@@ -87,7 +83,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             // Access to the location has been granted to the app.
             mMap.setMyLocationEnabled(true);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+        mMap.animateCamera(cameraUpdate);
+        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -118,4 +126,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
+
+    //Stuff from LocationListener that we dont use
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(String provider) { }
+
+    @Override
+    public void onProviderDisabled(String provider) { }
 }
