@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PupAlert</string>
     <string name="title_activity_maps">PupAlert Map</string>
+    <string name="title_activity_camera">CameraActivity</string>
 </resources>
