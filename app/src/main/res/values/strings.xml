@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">PupAlert</string>
     <string name="title_activity_maps">PupAlert Map</string>
+    <string name="title_activity_camera">PupAlert New Post</string>
+
 
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
