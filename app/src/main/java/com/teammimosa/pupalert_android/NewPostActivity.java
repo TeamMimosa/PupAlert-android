@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -26,24 +27,21 @@ import java.util.Date;
  */
 public class NewPostActivity extends AppCompatActivity
 {
-    private Button takePictureButton;
-    private ImageView imageView;
     private Uri file;
+    private ImageView button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-
-        takePictureButton = (Button) findViewById(R.id.button_image);
-        imageView = (ImageView) findViewById(R.id.imageview);
-
+        button = (ImageView) findViewById(R.id.imageView1);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
-            takePictureButton.setEnabled(false);
+            button.setEnabled(false);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
+
     }
 
     @Override
@@ -54,7 +52,7 @@ public class NewPostActivity extends AppCompatActivity
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED)
             {
-                takePictureButton.setEnabled(true);
+                button.setEnabled(true);
             }
         }
     }
@@ -71,13 +69,13 @@ public class NewPostActivity extends AppCompatActivity
     private static File getOutputMediaFile()
     {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "CameraDemo");
+                Environment.DIRECTORY_PICTURES), "PupAlert");
 
         if (!mediaStorageDir.exists())
         {
             if (!mediaStorageDir.mkdirs())
             {
-                Log.d("CameraDemo", "failed to create directory");
+                Log.d("PupAlert", "failed to create directory");
                 return null;
             }
         }
@@ -94,7 +92,11 @@ public class NewPostActivity extends AppCompatActivity
         {
             if (resultCode == RESULT_OK)
             {
-                imageView.setImageURI(file);
+                button.setImageURI(file);
+                button.setBackgroundResource(R.drawable.rounded);
+                //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+
             }
         }
     }
