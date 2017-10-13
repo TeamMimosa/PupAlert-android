@@ -20,4 +20,12 @@
         android:layout_marginTop="55dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/rounded" />
+    <TextView
+        android:id="@+id/loc_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="location is displayed here"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="336dp"/>
+
 </RelativeLayout>

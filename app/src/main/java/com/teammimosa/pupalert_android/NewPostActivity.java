@@ -1,7 +1,9 @@
 package com.teammimosa.pupalert_android;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import android.Manifest;
@@ -13,38 +15,44 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * The activity for creating a new post
  * @author Sydney Micklas, Domenic Portuesi
  */
-public class NewPostActivity extends AppCompatActivity
+public class NewPostActivity extends Fragment
 {
     private Uri file;
     private ImageView button;
+    private TextView currentLoc;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
+    protected void onCreateView(LayoutInflater inflater, ViewGroup container,
+                                Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         button = (ImageView) findViewById(R.id.imageView1);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        currentLoc = (TextView) findViewById(R.id.loc_display);
+        if (ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
             button.setEnabled(false);
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
-
+        if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            currentLoc.setText("Could not get location: permission denied");
+        }
     }
 
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
     {
         if (requestCode == 0)
@@ -85,7 +93,7 @@ public class NewPostActivity extends AppCompatActivity
                 "IMG_" + timeStamp + ".jpg");
     }
 
-    @Override
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == 100)
