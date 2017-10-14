@@ -33,7 +33,7 @@ import static android.app.Activity.RESULT_OK;
 public class NewPostFragment extends Fragment implements View.OnClickListener
 {
     private Uri file;
-    private ImageView button;
+    private ImageView button; //Made ImageView instead of button to make displaying photo easier
     private TextView currentLoc;
 
     @Override
@@ -56,7 +56,18 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         {
             currentLoc.setText("Could not get location: permission denied");
         }
-
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                switch (v.getId())
+                {
+                    case R.id.new_post_pic:
+                        takePicture(v);
+                        break;
+                }
+            }
+        });
         return rootView;
     }
 
@@ -73,6 +84,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    //Takes photo (launches camera) , builds file, stores to phone
     public void takePicture(View view)
     {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -93,6 +105,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    //Stores photo to user local data; this may be removed later
     private static File getOutputMediaFile()
     {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -112,6 +125,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 "IMG_" + timeStamp + ".jpg");
     }
 
+    //Displays photo taken in the ImageView "button"
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
