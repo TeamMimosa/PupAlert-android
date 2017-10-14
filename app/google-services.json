@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "426118891829-l47iqn6m9v9ibqm410q0kbdo86mfnrnk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.teammimosa.pupalert_android",
+            "certificate_hash": "94cf58d85c11964fdec1d86308ad2591df32445b"
+          }
+        },
+        {
           "client_id": "426118891829-e2dk23j0t194f4kgobk35fkdtgahkq3v.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -20,9 +20,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -35,7 +40,10 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     private Uri file;
     private ImageView button; //Made ImageView instead of button to make displaying photo easier
     private TextView currentLoc;
-
+    private double userLat;
+    private double userLong;
+    final FirebaseDatabase pupDataBase = FirebaseDatabase.getInstance();
+    DatabaseReference ref = pupDataBase.getReference("https://pupalert-f3b79.firebaseio.com/");
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                 Bundle savedInstanceState)
@@ -45,6 +53,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         button = (ImageView) rootView.findViewById(R.id.new_post_pic);
         currentLoc = (TextView) rootView.findViewById(R.id.loc_display);
 
+        //Disable camera button if permission to use camera was denied
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
             button.setEnabled(false);
@@ -56,6 +65,8 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         {
             currentLoc.setText("Could not get location: permission denied");
         }
+
+        //ActionListener for "button"
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v)
@@ -68,7 +79,24 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 }
             }
         });
+        retrieveLocation();
         return rootView;
+
+    }
+
+    //Retrieves, displays, stores the users location
+    public void retrieveLocation(){
+        //TO BE IMPLEMENTED
+        currentLoc.setText("1801 Woodland Road");   //PLACEHOLDER DATA
+        userLat = 65.222344;    //PLACEHOLDER
+        userLong = 94.349554; //PLACEHOLDER
+    }
+
+    //Stores data to server
+    public void storeData(){
+        DatabaseReference usersRef = ref.child("uid");
+        User user = new User(45.4444, 24.4334, "Sydney", "photo loc");
+        usersRef.setValue(user);
     }
 
     @Override
@@ -135,8 +163,24 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             {
                 button.setImageURI(file);
                 button.setBackgroundResource(R.drawable.rounded);
+                storeData();
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
         }
+    }
+
+    public static class User{
+        private Double userLat;
+        private Double userLong;
+        private String userID;
+        private String photo;
+
+        public User(Double lat, Double longi, String id, String pht){
+            userLat = lat;
+            userLong = longi;
+            userID = id;
+            photo = pht;
+        }
+
     }
 }
