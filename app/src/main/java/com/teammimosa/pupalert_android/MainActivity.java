@@ -3,13 +3,18 @@ package com.teammimosa.pupalert_android;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
+
+import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+        removeShiftMode(mBottomNav);
 
         MenuItem selectedItem;
         if (savedInstanceState != null)
@@ -57,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        //Sets the back button to map
         MenuItem homeItem = mBottomNav.getMenu().getItem(0);
         if (mSelectedItem != homeItem.getItemId())
         {
@@ -65,6 +72,36 @@ public class MainActivity extends AppCompatActivity
         } else
         {
             super.onBackPressed();
+        }
+    }
+
+    /**
+     * Removes the wierd shifting from nav bars.
+     * https://stackoverflow.com/questions/40972293/remove-animation-shifting-mode-from-bottomnavigationview-android
+     * @param view
+     */
+    private void removeShiftMode(BottomNavigationView view)
+    {
+        BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);
+        try
+        {
+            Field shiftingMode = menuView.getClass().getDeclaredField("mShiftingMode");
+            shiftingMode.setAccessible(true);
+            shiftingMode.setBoolean(menuView, false);
+            shiftingMode.setAccessible(false);
+            for (int i = 0; i < menuView.getChildCount(); i++)
+            {
+                BottomNavigationItemView item = (BottomNavigationItemView) menuView.getChildAt(i);
+                item.setShiftingMode(false);
+                // set once again checked value, so view will be updated
+                item.setChecked(item.getItemData().isChecked());
+            }
+        } catch (NoSuchFieldException e)
+        {
+            Log.e("ERROR NO SUCH FIELD", "Unable to get shift mode field");
+        } catch (IllegalAccessException e)
+        {
+            Log.e("ERROR ILLEGAL ALG", "Unable to change value of shift mode");
         }
     }
 
@@ -79,7 +116,7 @@ public class MainActivity extends AppCompatActivity
                 frag = new MapsFragment();
                 break;
             case R.id.menu_new_post:
-                frag = new MapsFragment();
+                frag = new NewPostFragment();
                 break;
             case R.id.menu_feed:
                 frag = new MapsFragment();
@@ -103,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         if (frag != null)
         {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.container, frag, frag.getTag());
+            ft.replace(R.id.container, frag, frag.getTag());
             ft.commit();
         }
     }
@@ -115,10 +152,5 @@ public class MainActivity extends AppCompatActivity
         {
             actionBar.setTitle(text);
         }
-    }
-
-    private int getColorFromRes(@ColorRes int resId)
-    {
-        return ContextCompat.getColor(this, resId);
     }
 }

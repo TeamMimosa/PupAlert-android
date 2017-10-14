@@ -1,8 +1,9 @@
 package com.teammimosa.pupalert_android;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -13,11 +14,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,27 +30,37 @@ import static android.app.Activity.RESULT_OK;
  * The activity for creating a new post
  * @author Sydney Micklas, Domenic Portuesi
  */
-public class NewPostActivity extends Fragment
+public class NewPostFragment extends Fragment implements View.OnClickListener
 {
     private Uri file;
     private ImageView button;
     private TextView currentLoc;
 
-    protected void onCreateView(LayoutInflater inflater, ViewGroup container,
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                 Bundle savedInstanceState)
     {
-        setContentView(R.layout.activity_camera);
-        button = (ImageView) findViewById(R.id.imageView1);
-        currentLoc = (TextView) findViewById(R.id.loc_display);
-        if (ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
+
+        button = (ImageView) rootView.findViewById(R.id.new_post_pic);
+        currentLoc = (TextView) rootView.findViewById(R.id.loc_display);
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
             button.setEnabled(false);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
-        if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+        //Check location for when we get the users loc for database
+        if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
             currentLoc.setText("Could not get location: permission denied");
         }
+
+        return rootView;
     }
 
+    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
     {
         if (requestCode == 0)
@@ -74,6 +82,17 @@ public class NewPostActivity extends Fragment
         startActivityForResult(intent, 100);
     }
 
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.new_post_pic:
+                takePicture(v);
+                break;
+        }
+    }
+
     private static File getOutputMediaFile()
     {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -93,8 +112,8 @@ public class NewPostActivity extends Fragment
                 "IMG_" + timeStamp + ".jpg");
     }
 
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == 100)
         {
@@ -103,8 +122,6 @@ public class NewPostActivity extends Fragment
                 button.setImageURI(file);
                 button.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-
             }
         }
     }
