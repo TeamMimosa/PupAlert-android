@@ -1,5 +1,7 @@
 package com.teammimosa.pupalert_android;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,6 +34,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
@@ -174,6 +178,24 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 button.setImageURI(file);
                 button.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                //Set text to cur loc
+                try
+                {
+                    Geocoder gcd = new Geocoder(getActivity(), Locale.getDefault());
+                    List<Address> addresses = gcd.getFromLocation(userLat, userLong, 1);
+                    if (addresses.size() > 0)
+                    {
+                        currentLoc.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+                    } else
+                    {
+                        currentLoc.setText("Location not found");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 
                 //TODO call after you post
                 storePost(userLat, userLong, "uid_test", "photo loc");
