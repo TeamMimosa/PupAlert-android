@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -20,16 +21,28 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * The fragment for our map viewer.
  *
  * @author Domenic Portuesi
  */
-public class MapsFragment extends Fragment implements LocationListener
+public class MapsFragment extends Fragment implements LocationListener, GoogleMap.OnCameraMoveListener
 {
     MapView mMapView;
     private GoogleMap googleMap;
@@ -66,7 +79,7 @@ public class MapsFragment extends Fragment implements LocationListener
                 enableMyLocation();
             }
         });
-
+        
         return rootView;
     }
 
@@ -99,6 +112,54 @@ public class MapsFragment extends Fragment implements LocationListener
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
+    }
+
+    /*
+    * Render markers in radius
+     */
+    @Override
+    public void onCameraMove()
+    {
+        //TODO add camera markers after firebase query
+        //https://stackoverflow.com/questions/18450081/add-markers-dynamically-on-google-maps-v2-for-android
+        // Get a reference to our posts
+        /*
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference().child("posts");
+
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+        Projection projection = googleMap.getProjection();
+        LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
+
+        final List<LatLng> positions = new ArrayList<LatLng>();
+        bounds.
+
+        for (int i = positions.size() - 1; i >= 0; i--)
+        {
+            LatLng position = positions.get(i);
+            if (bounds.contains(position))
+            {
+                googleMap.addMarker(new MarkerOptions().position(position));
+                positions.remove(i);
+            }
+        }
+        */
     }
 
     @Override

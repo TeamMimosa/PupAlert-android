@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * Utility functions for storing/reading from database.
- * Instantiate onCreate() to make sure getActivity() is not null.
+ * Instantiate in onCreate() to make sure getActivity() is not null.
  * @author Domenic Portuesi
  */
 
@@ -73,9 +73,9 @@ public class PupAlertFirebase
 
     public static class Post
     {
-        private Double userLat;
-        private Double userLong;
-        private String userID;
+        public Double userLat;
+        public Double userLong;
+        public String userID;
 
         public Post(Double lat, Double longi, String id, Uri pht)
         {
