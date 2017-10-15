@@ -1,6 +1,7 @@
 package com.teammimosa.pupalert_android;
 
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
@@ -14,8 +15,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.firebase.FirebaseApp;
+
 import java.lang.reflect.Field;
 
+/**
+ * Our main activity that hosts the nav bar and all fragments.
+ * @author Domenic Portuesi
+ */
 public class MainActivity extends AppCompatActivity
 {
     private static final String SELECTED_ITEM = "arg_selected_item";
@@ -23,11 +30,18 @@ public class MainActivity extends AppCompatActivity
     private BottomNavigationView mBottomNav;
     private int mSelectedItem;
 
+    public double curLat = 0;
+    public double curLong = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         mBottomNav = (BottomNavigationView) findViewById(R.id.navigation);
         mBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()

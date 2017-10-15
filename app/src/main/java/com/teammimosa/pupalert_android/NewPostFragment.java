@@ -1,6 +1,6 @@
 package com.teammimosa.pupalert_android;
 
-import android.content.DialogInterface;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,9 +18,14 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
@@ -33,20 +38,25 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * The activity for creating a new post
+ *
  * @author Sydney Micklas, Domenic Portuesi
  */
 public class NewPostFragment extends Fragment implements View.OnClickListener
 {
+    private FusedLocationProviderClient mFusedLocationClient;
+    private double userLat = 0;
+    private double userLong = 0;
+
     private Uri file;
     private ImageView button; //Made ImageView instead of button to make displaying photo easier
     private TextView currentLoc;
-    private double userLat;
-    private double userLong;
-    final FirebaseDatabase pupDataBase = FirebaseDatabase.getInstance();
-    DatabaseReference ref = pupDataBase.getReference("https://pupalert-f3b79.firebaseio.com/");
+
+
+    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                Bundle savedInstanceState)
+                             Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
 
@@ -61,13 +71,14 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         }
 
         //Check location for when we get the users loc for database
-        if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             currentLoc.setText("Could not get location: permission denied");
         }
 
         //ActionListener for "button"
-        button.setOnClickListener(new View.OnClickListener(){
+        button.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v)
             {
@@ -79,24 +90,23 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 }
             }
         });
-        retrieveLocation();
+
+        //add location listener to get curr lat and long.
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>()
+        {
+            @Override
+            public void onSuccess(Location location)
+            {
+                if (location != null)
+                {
+                    userLat =  location.getLatitude();
+                    userLong = location.getLongitude();
+                }
+            }
+        });
+
         return rootView;
-
-    }
-
-    //Retrieves, displays, stores the users location
-    public void retrieveLocation(){
-        //TO BE IMPLEMENTED
-        currentLoc.setText("1801 Woodland Road");   //PLACEHOLDER DATA
-        userLat = 65.222344;    //PLACEHOLDER
-        userLong = 94.349554; //PLACEHOLDER
-    }
-
-    //Stores data to server
-    public void storeData(){
-        DatabaseReference usersRef = ref.child("uid");
-        User user = new User(45.4444, 24.4334, "Sydney", "photo loc");
-        usersRef.setValue(user);
     }
 
     @Override
@@ -163,24 +173,60 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             {
                 button.setImageURI(file);
                 button.setBackgroundResource(R.drawable.rounded);
-                storeData();
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                //TODO call after you post
+                storePost(userLat, userLong, "uid_test", "photo loc");
             }
         }
     }
 
-    public static class User{
+    /**
+     * Uploads post to database
+     */
+    private void storePost(Double lat, Double longi, String id, String phtl)
+    {
+        //Check if we have the current location
+        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        {
+            String key = databaseRef.child("posts").push().getKey(); //generate random value
+            Post post = new Post(lat, longi, id, phtl);
+            Map<String, Object> postValues = post.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+
+            childUpdates.put("/posts/" + id + key, postValues);
+            databaseRef.updateChildren(childUpdates);
+        }
+        else
+        {
+            Toast.makeText(getActivity().getApplicationContext(), "Location permissions not allowed, not posting!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static class Post
+    {
         private Double userLat;
         private Double userLong;
         private String userID;
         private String photo;
 
-        public User(Double lat, Double longi, String id, String pht){
+        public Post(Double lat, Double longi, String id, String pht)
+        {
             userLat = lat;
             userLong = longi;
             userID = id;
             photo = pht;
         }
 
+        @Exclude
+        public Map<String, Object> toMap()
+        {
+            HashMap<String, Object> result = new HashMap<>();
+            result.put("uid", userID);
+            result.put("lat", userLat);
+            result.put("long", userLong);
+            result.put("photo", photo);
+            return result;
+        }
     }
 }
