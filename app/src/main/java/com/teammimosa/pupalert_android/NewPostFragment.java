@@ -26,9 +26,12 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -55,8 +58,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     private ImageView button; //Made ImageView instead of button to make displaying photo easier
     private TextView currentLoc;
 
-
-    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    PupAlertFirebase database;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +111,8 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 }
             }
         });
+
+        database = new PupAlertFirebase(getActivity());
 
         return rootView;
     }
@@ -198,57 +202,10 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 }
 
                 //TODO call after you post
-                storePost(userLat, userLong, "uid_test", "photo loc");
+                database.storePost(userLat, userLong, "uid_test", file);
             }
         }
     }
 
-    /**
-     * Uploads post to database
-     */
-    private void storePost(Double lat, Double longi, String id, String phtl)
-    {
-        //Check if we have the current location
-        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            String key = databaseRef.child("posts").push().getKey(); //generate random value
-            Post post = new Post(lat, longi, id, phtl);
-            Map<String, Object> postValues = post.toMap();
-            Map<String, Object> childUpdates = new HashMap<>();
 
-            childUpdates.put("/posts/" + id + key, postValues);
-            databaseRef.updateChildren(childUpdates);
-        }
-        else
-        {
-            Toast.makeText(getActivity().getApplicationContext(), "Location permissions not allowed, not posting!", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public static class Post
-    {
-        private Double userLat;
-        private Double userLong;
-        private String userID;
-        private String photo;
-
-        public Post(Double lat, Double longi, String id, String pht)
-        {
-            userLat = lat;
-            userLong = longi;
-            userID = id;
-            photo = pht;
-        }
-
-        @Exclude
-        public Map<String, Object> toMap()
-        {
-            HashMap<String, Object> result = new HashMap<>();
-            result.put("uid", userID);
-            result.put("lat", userLat);
-            result.put("long", userLong);
-            result.put("photo", photo);
-            return result;
-        }
-    }
 }
