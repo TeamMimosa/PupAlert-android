@@ -21,10 +21,18 @@
         android:background="@drawable/rounded" />
     <TextView
         android:id="@+id/loc_display"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="336dp"/>
+        android:layout_marginTop="336dp"
+        android:drawableBottom="@drawable/line"/>
+    <Button
+        android:id="@+id/post_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        android:layout_centerHorizontal="true"
+        android:layoutMarginTop="436dp"/>
 
 </RelativeLayout>
