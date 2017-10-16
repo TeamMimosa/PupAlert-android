@@ -29,6 +29,7 @@ import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -38,7 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -46,7 +49,7 @@ import java.util.Random;
  *
  * @author Domenic Portuesi
  */
-public class MapsFragment extends Fragment implements LocationListener, GoogleMap.OnCameraMoveListener
+public class MapsFragment extends Fragment implements LocationListener, GoogleMap.OnCameraMoveListener, GeoQueryEventListener
 {
     MapView mMapView;
     private GoogleMap googleMap;
@@ -55,6 +58,11 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
     private static final float MIN_DISTANCE = 1000;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
+    private static final GeoLocation INITIAL_CENTER = new GeoLocation(47.115, -88.541);
+    private GeoFire geoFire;
+    private GeoQuery geoQuery;
+    private Map<String,Marker> markers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -83,6 +91,13 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
                 enableMyLocation();
             }
         });
+        // setup GeoFire
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire");
+        this.geoFire = new GeoFire(ref);
+        this.geoQuery = this.geoFire.queryAtLocation(INITIAL_CENTER, 1);
+        this.markers = new HashMap<String, Marker>();
+
+        this.geoQuery.addGeoQueryEventListener(this);
 
         return rootView;
     }
@@ -116,6 +131,51 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
+    }
+
+    //https://github.com/firebase/geofire-java/blob/master/examples/SFVehicles/SF%20Vehicles/src/main/java/com/firebase/sfvehicles/SFVehiclesActivity.java
+
+    @Override
+    public void onKeyEntered(String key, GeoLocation location)
+    {
+        // Add a new marker to the map
+        Marker marker = this.googleMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
+        this.markers.put(key, marker);
+    }
+
+    @Override
+    public void onKeyExited(String key)
+    {
+        // Remove any old marker
+        Marker marker = this.markers.get(key);
+        if (marker != null)
+        {
+            marker.remove();
+            this.markers.remove(key);
+        }
+    }
+
+    @Override
+    public void onKeyMoved(String key, GeoLocation location)
+    {
+        // Move the marker
+        Marker marker = this.markers.get(key);
+        if (marker != null)
+        {
+            this.animateMarkerTo(marker, location.latitude, location.longitude);
+        }
+    }
+
+    @Override
+    public void onGeoQueryReady()
+    {
+
+    }
+
+    @Override
+    public void onGeoQueryError(DatabaseError error)
+    {
+
     }
 
     /*

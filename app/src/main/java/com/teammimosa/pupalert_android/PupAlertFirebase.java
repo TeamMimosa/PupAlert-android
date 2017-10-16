@@ -60,7 +60,7 @@ public class PupAlertFirebase
             storeImage(phtl, id + key);
 
             //geofire push loc;
-            DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("posts-geofire");
+            DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
             GeoFire geoFire = new GeoFire(geoRef);
             geoFire.setLocation(id + key, new GeoLocation(lat, longi));
         }
@@ -97,7 +97,7 @@ public class PupAlertFirebase
         public Map<String, Object> toMap()
         {
             HashMap<String, Object> result = new HashMap<>();
-            result.put("uid", userID);
+            result.put("posted-by", userID);
             result.put("lat", userLat);
             result.put("long", userLong);
             return result;
