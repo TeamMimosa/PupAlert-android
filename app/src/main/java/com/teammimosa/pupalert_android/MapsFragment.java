@@ -15,6 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -79,7 +83,7 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
                 enableMyLocation();
             }
         });
-        
+
         return rootView;
     }
 
@@ -122,44 +126,10 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
     {
         //TODO add camera markers after firebase query
         //https://stackoverflow.com/questions/18450081/add-markers-dynamically-on-google-maps-v2-for-android
-        // Get a reference to our posts
-        /*
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference().child("posts");
-
-        // Attach a listener to read the data at our posts reference
-        ref.addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
 
         Projection projection = googleMap.getProjection();
         LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
 
-        final List<LatLng> positions = new ArrayList<LatLng>();
-        bounds.
-
-        for (int i = positions.size() - 1; i >= 0; i--)
-        {
-            LatLng position = positions.get(i);
-            if (bounds.contains(position))
-            {
-                googleMap.addMarker(new MarkerOptions().position(position));
-                positions.remove(i);
-            }
-        }
-        */
     }
 
     @Override

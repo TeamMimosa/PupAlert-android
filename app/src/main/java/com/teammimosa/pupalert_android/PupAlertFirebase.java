@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
@@ -51,9 +54,15 @@ public class PupAlertFirebase
             Map<String, Object> childUpdates = new HashMap<>();
 
             childUpdates.put("/posts/" + id + key, postValues);
+
             databaseRef.updateChildren(childUpdates);
             //store image
             storeImage(phtl, id + key);
+
+            //geofire push loc;
+            DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("posts-geofire");
+            GeoFire geoFire = new GeoFire(geoRef);
+            geoFire.setLocation(id + key, new GeoLocation(lat, longi));
         }
         else
         {
