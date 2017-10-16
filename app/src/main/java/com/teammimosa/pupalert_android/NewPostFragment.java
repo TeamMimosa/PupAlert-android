@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,9 +56,9 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     private double userLong = 0;
 
     private Uri file;
-    private ImageView button; //Made ImageView instead of button to make displaying photo easier
+    private ImageView cameraButton; //Made ImageView instead of button to make displaying photo easier
     private TextView currentLoc;
-
+    private Button postButton;
     PupAlertFirebase database;
 
     @Override
@@ -66,13 +67,13 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     {
         View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
 
-        button = (ImageView) rootView.findViewById(R.id.new_post_pic);
+        cameraButton = (ImageView) rootView.findViewById(R.id.new_post_pic);
         currentLoc = (TextView) rootView.findViewById(R.id.loc_display);
 
         //Disable camera button if permission to use camera was denied
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
-            button.setEnabled(false);
+            cameraButton.setEnabled(false);
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
 
@@ -82,8 +83,8 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             currentLoc.setText("Could not get location: permission denied");
         }
 
-        //ActionListener for "button"
-        button.setOnClickListener(new View.OnClickListener()
+        //Button for taking picture 
+        cameraButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -96,6 +97,22 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 }
             }
         });
+
+        //Button for posting data
+        postButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                switch (v.getId())
+                {
+                    case R.id.post_button:
+                        postPup();
+                        break;
+                }
+            }
+        });
+
 
         //add location listener to get curr lat and long.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -113,7 +130,6 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         });
 
         database = new PupAlertFirebase(getActivity());
-
         return rootView;
     }
 
@@ -125,9 +141,13 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED)
             {
-                button.setEnabled(true);
+                cameraButton.setEnabled(true);
             }
         }
+    }
+    //Uploads data to server
+    public void postPup(){
+        database.storePost(userLat, userLong, "uid_test", file);
     }
 
     //Takes photo (launches camera) , builds file, stores to phone
@@ -179,8 +199,8 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         {
             if (resultCode == RESULT_OK)
             {
-                button.setImageURI(file);
-                button.setBackgroundResource(R.drawable.rounded);
+                cameraButton.setImageURI(file);
+                cameraButton.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
                 //Set text to cur loc
@@ -200,9 +220,6 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 {
                     e.printStackTrace();
                 }
-
-                //TODO call after you post
-                database.storePost(userLat, userLong, "uid_test", file);
             }
         }
     }
