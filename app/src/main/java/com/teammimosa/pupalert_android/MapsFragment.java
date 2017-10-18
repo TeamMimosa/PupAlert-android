@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,10 +50,10 @@ import java.util.Random;
  *
  * @author Domenic Portuesi
  */
-public class MapsFragment extends Fragment implements LocationListener, GoogleMap.OnCameraMoveListener, GeoQueryEventListener
+public class MapsFragment extends Fragment implements LocationListener, GeoQueryEventListener
 {
-    MapView mMapView;
-    private GoogleMap googleMap;
+    private MapView mMapView;
+    public GoogleMap googleMap;
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
@@ -91,10 +92,11 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
                 enableMyLocation();
             }
         });
+
         // setup GeoFire
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire");
         this.geoFire = new GeoFire(ref);
-        this.geoQuery = this.geoFire.queryAtLocation(INITIAL_CENTER, 1);
+        this.geoQuery = this.geoFire.queryAtLocation(INITIAL_CENTER, 100);
         this.markers = new HashMap<String, Marker>();
 
         this.geoQuery.addGeoQueryEventListener(this);
@@ -128,6 +130,7 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
         {
             // Access to the location has been granted to the app.
             googleMap.setMyLocationEnabled(true);
+
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
@@ -141,6 +144,7 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
         // Add a new marker to the map
         Marker marker = this.googleMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
         this.markers.put(key, marker);
+
     }
 
     @Override
@@ -158,12 +162,7 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
     @Override
     public void onKeyMoved(String key, GeoLocation location)
     {
-        // Move the marker
-        Marker marker = this.markers.get(key);
-        if (marker != null)
-        {
-            this.animateMarkerTo(marker, location.latitude, location.longitude);
-        }
+
     }
 
     @Override
@@ -178,18 +177,41 @@ public class MapsFragment extends Fragment implements LocationListener, GoogleMa
 
     }
 
+    //FOR FUTURE USE:
+
     /*
-    * Render markers in radius
+    * Returns the radius in visible region.
      */
-    @Override
-    public void onCameraMove()
+    private double calculateVisibleRadius(VisibleRegion visibleRegion)
     {
-        //TODO add camera markers after firebase query
-        //https://stackoverflow.com/questions/18450081/add-markers-dynamically-on-google-maps-v2-for-android
+        float[] distanceWidth = new float[1];
+        float[] distanceHeight = new float[1];
 
-        Projection projection = googleMap.getProjection();
-        LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
+        LatLng farRight = visibleRegion.farRight;
+        LatLng farLeft = visibleRegion.farLeft;
+        LatLng nearRight = visibleRegion.nearRight;
+        LatLng nearLeft = visibleRegion.nearLeft;
 
+        //calculate the distance width (left <-> right of map on screen)
+        Location.distanceBetween(
+                (farLeft.latitude + nearLeft.latitude) / 2,
+                farLeft.longitude,
+                (farRight.latitude + nearRight.latitude) / 2,
+                farRight.longitude,
+                distanceWidth
+        );
+
+        //calculate the distance height (top <-> bottom of map on screen)
+        Location.distanceBetween(
+                farRight.latitude,
+                (farRight.longitude + farLeft.longitude) / 2,
+                nearRight.latitude,
+                (nearRight.longitude + nearLeft.longitude) / 2,
+                distanceHeight
+        );
+
+        //visible radius is (smaller distance) / 2:
+        return (distanceWidth[0] < distanceHeight[0]) ? distanceWidth[0] / 2 : distanceHeight[0] / 2;
     }
 
     @Override
