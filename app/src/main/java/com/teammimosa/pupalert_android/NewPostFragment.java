@@ -61,6 +61,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     private Button postButton;
     PupAlertFirebase database;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -68,6 +69,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
 
         cameraButton = (ImageView) rootView.findViewById(R.id.new_post_pic);
+        postButton = (Button) rootView.findViewById(R.id.post_button);
         currentLoc = (TextView) rootView.findViewById(R.id.loc_display);
 
         //Disable camera button if permission to use camera was denied
