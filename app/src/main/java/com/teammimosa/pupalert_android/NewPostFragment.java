@@ -83,7 +83,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             currentLoc.setText("Could not get location: permission denied");
         }
 
-        //Button for taking picture 
+        //Button for taking picture
         cameraButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
