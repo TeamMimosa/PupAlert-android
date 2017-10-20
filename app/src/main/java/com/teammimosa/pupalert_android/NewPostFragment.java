@@ -21,26 +21,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import com.teammimosa.pupalert_android.util.PupAlertFirebase;
+import com.teammimosa.pupalert_android.util.Utils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -109,7 +102,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 switch (v.getId())
                 {
                     case R.id.post_button:
-                        postPup();
+                        database.storePost("user-test", Utils.getTimeStamp(), userLat, userLong, file);
                         break;
                 }
             }
@@ -146,10 +139,6 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 cameraButton.setEnabled(true);
             }
         }
-    }
-    //Uploads data to server
-    public void postPup(){
-        database.storePost(userLat, userLong, "uid_test", file);
     }
 
     //Takes photo (launches camera) , builds file, stores to phone

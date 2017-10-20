@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.util;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -28,6 +28,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
+
+import com.teammimosa.pupalert_android.R;
 
 /**
  * Utility class for access to runtime permissions.
