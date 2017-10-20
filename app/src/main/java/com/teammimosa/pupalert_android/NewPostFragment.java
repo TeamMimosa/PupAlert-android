@@ -102,7 +102,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 switch (v.getId())
                 {
                     case R.id.post_button:
-                        database.storePost("user-test", Utils.getTimeStamp(), userLat, userLong, file);
+                        database.storePost("user-test", Utils.getTimeStampForDatabase(), userLat, userLong, file);
                         break;
                 }
             }

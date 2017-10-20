@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.firebase.FirebaseApp;
+import com.teammimosa.pupalert_android.dummy.DummyContent;
 
 import java.lang.reflect.Field;
 
@@ -133,7 +134,8 @@ public class MainActivity extends AppCompatActivity
                 frag = new NewPostFragment();
                 break;
             case R.id.menu_feed:
-                frag = new MapsFragment();
+                frag = new FeedFragment();
+                break;
             case R.id.menu_user:
                 frag = new MapsFragment();
                 break;

@@ -50,7 +50,7 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
-    private static final GeoLocation INITIAL_CENTER = new GeoLocation(47.115, -88.541);
+    private static final GeoLocation INITIAL_CENTER = new GeoLocation(51.574446, -17.031768); //Center of maps (kind of)
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     private Map<String,Marker> markers;
@@ -86,7 +86,7 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
         // setup GeoFire
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("geofire");
         this.geoFire = new GeoFire(ref);
-        this.geoQuery = this.geoFire.queryAtLocation(INITIAL_CENTER, 100);
+        this.geoQuery = this.geoFire.queryAtLocation(INITIAL_CENTER, 9999); //query the whole earth
         this.markers = new HashMap<String, Marker>();
 
         this.geoQuery.addGeoQueryEventListener(this);
