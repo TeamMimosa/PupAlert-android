@@ -18,15 +18,23 @@
         android:layout_height="225dp"
         android:layout_marginTop="55dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/rounded" />
+        android:background="@drawable/rounded"
+        android:id="@+id/view" />
     <TextView
         android:id="@+id/loc_display"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
         android:layout_centerHorizontal="true"
         android:layout_marginTop="336dp"
-        android:drawableBottom="@drawable/line"/>
+        />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="356dp"
+        android:background="#000000"
+        android:layout_alignStart="@+id/new_post_pic"
+        android:layout_alignEnd="@+id/view" />
     <Button
         android:id="@+id/post_button"
         android:layout_width="wrap_content"
