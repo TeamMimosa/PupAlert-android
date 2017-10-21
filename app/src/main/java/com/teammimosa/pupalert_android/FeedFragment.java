@@ -129,45 +129,4 @@ public class FeedFragment extends Fragment
             }
         });
     }
-
-
-    private ArrayList<FeedPost> getDataSet()
-    {
-        final ArrayList results = new ArrayList<FeedPost>();
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
-
-        // Attach a listener to read the data at our posts reference
-        dbRef.addChildEventListener(new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-                FeedPost feedPost = new FeedPost(post.userID, dataSnapshot.getKey());
-                results.add(feedPost);
-                ((FeedRecyclerViewAdapter) mAdapter).addItem(feedPost);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-            }
-        });
-        return results;
-    }
 }
