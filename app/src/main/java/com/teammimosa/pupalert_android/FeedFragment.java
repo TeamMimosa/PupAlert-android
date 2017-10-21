@@ -1,38 +1,39 @@
 package com.teammimosa.pupalert_android;
 
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
+
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.teammimosa.pupalert_android.util.PupAlertFirebase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fragment that demonstrates how to use CardView.
  */
 public class FeedFragment extends Fragment
 {
-    private static final String TAG = FeedFragment.class.getSimpleName();
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
-    /**
-     * The CardView widget.
-     */
-    //@VisibleForTesting
-    CardView mCardView;
-
-    /**
-     * SeekBar that changes the cornerRadius attribute for the {@link #mCardView} widget.
-     */
-    //@VisibleForTesting
-    SeekBar mRadiusSeekBar;
-
-    /**
-     * SeekBar that changes the Elevation attribute for the {@link #mCardView} widget.
-     */
-    //@VisibleForTesting
-    SeekBar mElevationSeekBar;
+    private ArrayList<FeedPost> posts;
 
     /**
      * Use this factory method to create a new instance of
@@ -47,9 +48,7 @@ public class FeedFragment extends Fragment
         return fragment;
     }
 
-    public FeedFragment()
-    {
-    }
+    public FeedFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -58,62 +57,117 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_feed, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
+
+        posts = new ArrayList<FeedPost>();
+
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.feed_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
+        mRecyclerView.setAdapter(mAdapter);
+
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
+
+        // Attach a listener to read the data at our posts reference
+        dbRef.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                FeedPost feedPost = new FeedPost(post.userID, dataSnapshot.getKey());
+                posts.add(feedPost);
+                mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
+                mRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+            }
+        });
+
+        // Code to Add an item with default animation
+        //((MyRecyclerViewAdapter) mAdapter).addItem(obj, index);
+
+        // Code to remove an item with default animation
+        //((MyRecyclerViewAdapter) mAdapter).deleteItem(index);
+
+        return rootView;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState)
+    public void onResume()
     {
-        super.onViewCreated(view, savedInstanceState);
-        mCardView = (CardView) view.findViewById(R.id.cardview);
-        mRadiusSeekBar = (SeekBar) view.findViewById(R.id.cardview_radius_seekbar);
-        mRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        super.onResume();
+        ((FeedRecyclerViewAdapter) mAdapter).setOnItemClickListener(new FeedRecyclerViewAdapter.MyClickListener()
         {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            public void onItemClick(int position, View v)
             {
-                Log.d(TAG, String.format("SeekBar Radius progress : %d", progress));
-                mCardView.setRadius(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
-            {
-                //Do nothing
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
-            {
-                //Do nothing
+                //TODO implement when card is clicked
             }
         });
+    }
 
-        mElevationSeekBar = (SeekBar) view.findViewById(R.id.cardview_elevation_seekbar);
-        mElevationSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+
+    private ArrayList<FeedPost> getDataSet()
+    {
+        final ArrayList results = new ArrayList<FeedPost>();
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
+
+        // Attach a listener to read the data at our posts reference
+        dbRef.addChildEventListener(new ChildEventListener()
         {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
-                Log.d(TAG, String.format("SeekBar Elevation progress : %d", progress));
-                mCardView.setCardElevation(progress);
+                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                FeedPost feedPost = new FeedPost(post.userID, dataSnapshot.getKey());
+                results.add(feedPost);
+                ((FeedRecyclerViewAdapter) mAdapter).addItem(feedPost);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
             {
-                //Do nothing
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
+            public void onChildRemoved(DataSnapshot dataSnapshot)
             {
-                //Do nothing
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
             }
         });
+        return results;
     }
 }

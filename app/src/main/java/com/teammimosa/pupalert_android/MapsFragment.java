@@ -55,6 +55,21 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
     private GeoQuery geoQuery;
     private Map<String,Marker> markers;
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment NotificationFragment.
+     */
+    public static MapsFragment newInstance()
+    {
+        MapsFragment fragment = new MapsFragment();
+        fragment.setRetainInstance(true);
+        return fragment;
+    }
+
+    public MapsFragment(){}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {

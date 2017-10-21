@@ -128,13 +128,13 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId())
         {
             case R.id.menu_map:
-                frag = new MapsFragment();
+                frag = MapsFragment.newInstance();
                 break;
             case R.id.menu_new_post:
                 frag = new NewPostFragment();
                 break;
             case R.id.menu_feed:
-                frag = new FeedFragment();
+                frag = FeedFragment.newInstance();
                 break;
             case R.id.menu_user:
                 frag = new MapsFragment();

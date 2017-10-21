@@ -83,12 +83,34 @@ public class PupAlertFirebase
     public static class Post
     {
         public String userID;
-        public String timeStamp;
+        public String timestamp;
 
-        public Post(String postedBy, String timeStamp)
+        public Post(String postedBy, String timestamp)
         {
             this.userID = postedBy;
-            this.timeStamp = timeStamp;
+            this.timestamp = timestamp;
+        }
+
+        public Post(){}
+
+        public void setpostedBy(String id)
+        {
+            userID = id;
+        }
+
+        public String getpostedBy()
+        {
+            return userID;
+        }
+
+        public void settimestamp(String timestamp)
+        {
+            this.timestamp = timestamp;
+        }
+
+        public String getttimestamp()
+        {
+            return this.timestamp;
         }
 
         @Exclude
@@ -96,7 +118,7 @@ public class PupAlertFirebase
         {
             HashMap<String, Object> result = new HashMap<>();
             result.put("postedBy", userID);
-            result.put("timestamp", timeStamp);
+            result.put("timestamp", timestamp);
             return result;
         }
     }
