@@ -115,7 +115,7 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         //move camera to user position
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
         googleMap.animateCamera(cameraUpdate);
         locationManager.removeUpdates(this);
     }
