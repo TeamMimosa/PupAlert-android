@@ -70,6 +70,7 @@ public class FeedFragment extends Fragment
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setNestedScrollingEnabled(false);
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
 
@@ -84,6 +85,7 @@ public class FeedFragment extends Fragment
                 posts.add(feedPost);
                 mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
                 mRecyclerView.setAdapter(mAdapter);
+                mRecyclerView.setNestedScrollingEnabled(false);
             }
 
             @Override
