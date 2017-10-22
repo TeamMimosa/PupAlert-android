@@ -14,6 +14,8 @@ Android studio will do its thing, it should download/build all dependencies.
 
 Plug your phone in, and click the "Launch" button in android studio.
 
+To get maps to work, copy the debug.keystore to your .android folder, relplacing the old one.
+
 ## Using Pup-Alert
 
 When Pup-alert android hits beta, we will have builds in the "releases" tab of github.
