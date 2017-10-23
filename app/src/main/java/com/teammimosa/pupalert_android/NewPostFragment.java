@@ -64,6 +64,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         cameraButton = (ImageView) rootView.findViewById(R.id.new_post_pic);
         postButton = (Button) rootView.findViewById(R.id.post_button);
         currentLoc = (TextView) rootView.findViewById(R.id.loc_display);
+        postButton.setEnabled(false);
 
         //Disable camera button if permission to use camera was denied
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
@@ -190,6 +191,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
         {
             if (resultCode == RESULT_OK)
             {
+                postButton.setEnabled(true);
                 cameraButton.setImageURI(file);
                 cameraButton.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);

@@ -32,7 +32,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="356dp"
-        android:background="#000000"
+        android:background="#ffcf6f"
         android:layout_alignStart="@+id/new_post_pic"
         android:layout_alignEnd="@+id/view" />
     <Button
@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:text="Post"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="436dp"/>
+        android:layout_marginTop="436dp"
+        android:backgroundTint="#ffcf6f"/>
 
 </RelativeLayout>
