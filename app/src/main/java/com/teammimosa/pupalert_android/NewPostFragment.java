@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -94,7 +95,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             }
         });
 
-        //Button for posting data
+        //Button for posting data, creates confirmation toast
         postButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -104,6 +105,7 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 {
                     case R.id.post_button:
                         database.storePost("user-test", Utils.getTimeStampForDatabase(), userLat, userLong, file);
+                        Toast.makeText(getActivity(), "Post submitted!", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
