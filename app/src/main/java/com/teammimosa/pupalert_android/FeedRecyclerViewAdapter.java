@@ -25,12 +25,14 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     {
         TextView postedBy;
         ImageView image;
+        TextView location;
 
         public DataObjectHolder(View itemView)
         {
             super(itemView);
             postedBy = (TextView) itemView.findViewById(R.id.card_author);
             image = (ImageView) itemView.findViewById(R.id.card_image);
+            location = (TextView)itemView.findViewById(R.id.card_location);
             itemView.setOnClickListener(this);
         }
 
@@ -74,6 +76,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         //load the image with glide
         StorageReference storRef = FirebaseStorage.getInstance().getReference().child("posts/" + mDataset.get(position).getImageKey());
         Glide.with(appContext).using(new FirebaseImageLoader()).load(storRef).into(holder.image);
+
+        holder.location.setText(mDataset.get(position).getPostedBy());
     }
 
     public void addItem(FeedPost dataObj, int index)

@@ -25,13 +25,34 @@
                 android:layout_alignParentTop="true"
                 android:scaleType="centerCrop"/>
 
+            <ImageView
+                android:id="@+id/card_location_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="@dimen/margin_tiny"
+                android:scaleType="centerCrop"
+                android:layout_below="@+id/card_image"
+                android:src="@drawable/ic_place_black"
+                android:layout_marginTop="@dimen/margin_small"
+                android:tint="@color/cardview_marker" />
+
+            <TextView
+                android:id="@+id/card_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/card_image"
+                android:layout_alignLeft="@+id/card_location_icon"
+                android:layout_marginLeft="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_small"
+                android:textStyle="bold"/>
+
             <TextView
                 android:id="@+id/card_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/card_image"
-                android:layout_marginLeft="@dimen/margin_small"
-                android:textStyle="bold"/>
+                android:layout_below="@+id/card_location"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginLeft="@dimen/margin_small"/>
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>
