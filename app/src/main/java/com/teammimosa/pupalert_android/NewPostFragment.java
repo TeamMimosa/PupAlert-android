@@ -1,5 +1,7 @@
 package com.teammimosa.pupalert_android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -89,7 +91,8 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 switch (v.getId())
                 {
                     case R.id.new_post_pic:
-                        takePicture(v);
+                       // takePicture(v);
+                        selectPicture();
                         break;
                 }
             }
@@ -145,24 +148,49 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
     }
 
     //Takes photo (launches camera) , builds file, stores to phone
-    public void takePicture(View view)
+    public void pictureFromCamera()
     {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         file = Uri.fromFile(getOutputMediaFile());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
-
         startActivityForResult(intent, 100);
     }
 
+    //Create dialog, select from gallery or take a picture
+    public void selectPicture(){
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Add Photo");
+        builder.setItems(items, new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (items[item].equals("Take Photo")) {
+                    pictureFromCamera();
+
+                } else if (items[item].equals("Choose from Library")) {
+                    pictureFromGallery();
+
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+
+    }
+
+    public void pictureFromGallery(){
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        file = intent.getData();
+        startActivityForResult(intent, 200);
+    }
     @Override
     public void onClick(View v)
     {
-        switch (v.getId())
-        {
-            case R.id.new_post_pic:
-                takePicture(v);
-                break;
-        }
+
     }
 
     //Stores photo to user local data; this may be removed later
@@ -187,35 +215,38 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
 
     //Displays photo taken in the ImageView "button"
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == 100)
-        {
-            if (resultCode == RESULT_OK)
-            {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100){
+            if (resultCode == RESULT_OK){
                 postButton.setEnabled(true);
                 cameraButton.setImageURI(file);
                 cameraButton.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-                //Set text to cur loc
-                try
-                {
-                    Geocoder gcd = new Geocoder(getActivity(), Locale.getDefault());
-                    List<Address> addresses = gcd.getFromLocation(userLat, userLong, 1);
-                    if (addresses.size() > 0)
-                    {
-                        currentLoc.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                    } else
-                    {
-                        currentLoc.setText("Location not found");
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+
             }
+        }
+
+        if(requestCode == 200){
+            if(resultCode == RESULT_OK){
+               postButton.setEnabled(true);
+                file = data.getData();
+                cameraButton.setImageURI(file);
+                cameraButton.setBackgroundResource(R.drawable.rounded);
+            }
+        }
+        //Set text to cur loc
+        try {
+            Geocoder gcd = new Geocoder(getActivity(), Locale.getDefault());
+            List<Address> addresses = gcd.getFromLocation(userLat, userLong, 1);
+            if (addresses.size() > 0) {
+                currentLoc.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+            } else {
+                currentLoc.setText("Location not found");
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
