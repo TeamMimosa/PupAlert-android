@@ -1,6 +1,6 @@
 package com.teammimosa.pupalert_android;
 
-import android.net.Uri;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * A "card" object for the feed.
@@ -10,27 +10,33 @@ import android.net.Uri;
 public class FeedPost
 {
     private String postedBy;
-    private String image;
+    private String imageKey;
+    private LatLng postLoc;
 
-    public FeedPost(String author, String imageKey)
+    public FeedPost(String author, String imageKey, LatLng postLoc)
     {
         this.postedBy = author;
-        this.image = imageKey;
+        this.imageKey = imageKey;
+        this.postLoc = postLoc;
     }
 
     public String getPostedBy()
     {
         return postedBy;
     }
-
     public String getImageKey()
     {
-        return image;
+        return imageKey;
+    }
+    public LatLng getPostLoc()
+    {
+        return postLoc;
     }
 
     public void setPostedBy(String author)
     {
         this.postedBy = author;
     }
-    public void setImage(String image) { this.image = image; }
+    public void setImageKey(String imageKey) { this.imageKey = imageKey; }
+    public void setPostLoc(LatLng postLoc) { this.postLoc = postLoc; }
 }

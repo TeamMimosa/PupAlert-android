@@ -1,6 +1,8 @@
 package com.teammimosa.pupalert_android;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerViewAdapter.DataObjectHolder>
 {
@@ -77,7 +81,26 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         StorageReference storRef = FirebaseStorage.getInstance().getReference().child("posts/" + mDataset.get(position).getImageKey());
         Glide.with(appContext).using(new FirebaseImageLoader()).load(storRef).into(holder.image);
 
-        holder.location.setText(mDataset.get(position).getPostedBy());
+        //set the cards location
+        try
+        {
+            Geocoder gcd = new Geocoder(appContext, Locale.getDefault());
+            double lat = mDataset.get(position).getPostLoc().latitude;
+            double longi = mDataset.get(position).getPostLoc().longitude;
+            List<Address> addresses = gcd.getFromLocation(lat, longi, 1);
+            if (addresses.size() > 0)
+            {
+                holder.location.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+            }
+            else
+            {
+                holder.location.setText("Location not found");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void addItem(FeedPost dataObj, int index)

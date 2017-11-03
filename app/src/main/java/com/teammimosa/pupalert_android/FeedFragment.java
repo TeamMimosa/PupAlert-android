@@ -10,7 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.LocationCallback;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -78,14 +82,41 @@ public class FeedFragment extends Fragment
         dbRef.addChildEventListener(new ChildEventListener()
         {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            public void onChildAdded(final DataSnapshot dataSnapshot, String s)
             {
-                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-                FeedPost feedPost = new FeedPost(post.userID, dataSnapshot.getKey());
-                posts.add(feedPost);
-                mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
-                mRecyclerView.setAdapter(mAdapter);
-                mRecyclerView.setNestedScrollingEnabled(false);
+                //query location of post key
+                //FIXME query within query? No problem. YET.
+                //TODO SORTING CARDS
+                DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
+                GeoFire geoFire = new GeoFire(geoRef);
+                geoFire.getLocation(dataSnapshot.getKey(), new LocationCallback()
+                {
+                    @Override
+                    public void onLocationResult(String key, GeoLocation location)
+                    {
+                        if (location != null)
+                        {
+                            //add post to the adapater.
+                            PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                            FeedPost feedPost = new FeedPost(post.userID, key, new LatLng(location.latitude, location.longitude));
+                            posts.add(feedPost);
+                            //re-create the adapter.
+                            mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
+                            mRecyclerView.setAdapter(mAdapter);
+                            mRecyclerView.setNestedScrollingEnabled(false);
+                        }
+                        else
+                        {
+                            System.out.println(String.format("There is no location for key %s in GeoFire", key));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+                        System.err.println("There was an error getting the GeoFire location: " + databaseError);
+                    }
+                });
             }
 
             @Override
@@ -94,7 +125,7 @@ public class FeedFragment extends Fragment
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
+            public void onChildRemoved(final DataSnapshot dataSnapshot)
             {
             }
 
