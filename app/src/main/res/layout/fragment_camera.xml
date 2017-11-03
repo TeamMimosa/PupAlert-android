@@ -2,17 +2,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/layout">
+    android:id="@+id/layout"
+    >
 
     <ImageView
         android:id="@+id/new_post_pic"
-        android:layout_width="216dp"
-        android:layout_height="216dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:scaleType="centerCrop"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/add_photo"/>
+        android:background="@drawable/ic_add_a_photo_black_24dp"
+        android:layout_marginBottom="12dp"
+        android:layout_alignBottom="@+id/view"
+        android:layout_centerHorizontal="true" />
     <View
         android:layout_width="225dp"
         android:layout_height="225dp"
@@ -32,7 +33,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:layout_marginTop="356dp"
-        android:background="#ffcf6f"
+        android:background="#8a8a8a"
         android:layout_alignStart="@+id/new_post_pic"
         android:layout_alignEnd="@+id/view" />
     <Button
@@ -42,6 +43,6 @@
         android:text="Post"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="436dp"
-        android:backgroundTint="#ffcf6f"/>
+        android:background="#ffcf6f" />
 
 </RelativeLayout>
