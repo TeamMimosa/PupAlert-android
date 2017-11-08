@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity
     private BottomNavigationView mBottomNav;
     private int mSelectedItem;
 
-    public double curLat = 0;
-    public double curLong = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -124,7 +121,6 @@ public class MainActivity extends AppCompatActivity
     {
         Fragment frag = null;
 
-        //TODO Set fragments correctly
         switch (item.getItemId())
         {
             case R.id.menu_map:
@@ -137,7 +133,7 @@ public class MainActivity extends AppCompatActivity
                 frag = FeedFragment.newInstance();
                 break;
             case R.id.menu_user:
-                frag = new MapsFragment();
+                frag = AccountFragment.newInstance();
                 break;
         }
 
