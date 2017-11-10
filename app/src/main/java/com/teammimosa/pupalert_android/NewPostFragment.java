@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
@@ -104,12 +108,31 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
             @Override
             public void onClick(View v)
             {
+                FirebaseUser curAcct =  FirebaseAuth.getInstance().getCurrentUser();
                 switch (v.getId())
                 {
                     case R.id.post_button:
-                        database.storePost("user-test", Utils.getTimeStampForDatabase(), userLat, userLong, file);
-                        Toast.makeText(getActivity(), "Post submitted!", Toast.LENGTH_SHORT).show();
-                        break;
+                        if(curAcct != null)
+                        {
+                            String postedBy = curAcct.getUid();
+                            database.storePost(postedBy, Utils.getTimeStampForDatabase(), userLat, userLong, file);
+                            database.incrementPostsByOne(postedBy);
+                            Toast.makeText(getActivity(), "Post submitted!", Toast.LENGTH_SHORT).show();
+
+                            //reload fragment
+                            Fragment frag = new NewPostFragment();
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, frag, frag.getTag());
+                            ft.commit();
+                            break;
+                        }
+                        else
+                        {
+                            Fragment frag = AccountFragment.newInstance();
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, frag, frag.getTag());
+                            ft.commit();
+                        }
                 }
             }
         });

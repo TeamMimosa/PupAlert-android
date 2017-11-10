@@ -2,11 +2,14 @@ package com.teammimosa.pupalert_android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -15,7 +18,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.teammimosa.pupalert_android.util.PupAlertFirebase;
+
+import java.util.concurrent.Executor;
 
 /**
  * Signs in with google, renders account ui
@@ -24,7 +41,12 @@ import com.google.android.gms.tasks.Task;
 public class AccountFragment extends Fragment implements View.OnClickListener
 {
     private GoogleSignInClient gsic;
+    private FirebaseAuth mAuth;
     private static final int RC_SIGN_IN = 9001;
+
+    private View rootView;
+
+    PupAlertFirebase database;
 
     public AccountFragment()
     {
@@ -44,27 +66,26 @@ public class AccountFragment extends Fragment implements View.OnClickListener
 
         //Google sign in stuff
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         gsic = GoogleSignIn.getClient(getActivity(), gso);
 
+        database = new PupAlertFirebase(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View rootView = inflater.inflate(R.layout.fragment_account, container, false);
-
-        // Set the dimensions of the sign-in button.
-        SignInButton signInButton = rootView.findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setOnClickListener(this);
+        rootView = inflater.inflate(R.layout.fragment_account, container, false);
 
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-        updateUI(account);
+       // GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
 
         // Inflate the layout for this fragment
         return rootView;
@@ -74,18 +95,73 @@ public class AccountFragment extends Fragment implements View.OnClickListener
      * Updates the UI according to the account (including null if the user is not signed in.)
      * @param account
      */
-    private void updateUI(GoogleSignInAccount account)
+    private void updateUI(final FirebaseUser account)
     {
-        //TODO :
-        //https://stackoverflow.com/questions/5953502/how-do-i-change-the-view-inside-a-fragment
-        if(account != null)
+        if(account != null) //signed in
         {
-            //Signed in ui
+            //check if user exists in db, if not, add them.
+            //TODO possibly move where it checks if the user exists?
+            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(account.getUid());
+
+            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot)
+                {
+                    if (dataSnapshot.exists())
+                    {
+                        // User exists. Do nothing
+                    } else
+                    {
+                        database.storeUser(account.getUid(), account.getDisplayName(), 0);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError)
+                {
+                }
+            });
+
+            rootView.findViewById(R.id.account_signed_out).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.account_signed_in).setVisibility(View.VISIBLE);
+
+            TextView acct_name = rootView.findViewById(R.id.account_name);
+            acct_name.setText(account.getDisplayName());
         }
         else
         {
-            //not signed in ui
+            // Set the dimensions of the sign-in button.
+            SignInButton signInButton = rootView.findViewById(R.id.sign_in_button);
+            signInButton.setSize(SignInButton.SIZE_STANDARD);
+            signInButton.setOnClickListener(this);
         }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct)
+    {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        }
+                        else
+                        {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(getActivity(), "Login Failed!", Toast.LENGTH_SHORT);
+                            updateUI(null);
+                        }
+                    }
+                });
     }
 
     private void createSignInDialog()
@@ -108,16 +184,24 @@ public class AccountFragment extends Fragment implements View.OnClickListener
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN)
         {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            try
+            {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e)
+            {
+                // Google Sign In failed, update UI appropriately
+                Toast.makeText(getActivity(), "Login Failed!", Toast.LENGTH_SHORT);
+                updateUI(null);
+            }
         }
     }
 
+    /*
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask)
     {
         try
@@ -133,5 +217,5 @@ public class AccountFragment extends Fragment implements View.OnClickListener
             updateUI(null);
         }
     }
-
+*/
 }

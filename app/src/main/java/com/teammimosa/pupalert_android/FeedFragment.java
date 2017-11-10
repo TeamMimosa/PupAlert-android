@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -70,13 +71,15 @@ public class FeedFragment extends Fragment
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.feed_recycler_view);
         mRecyclerView.setHasFixedSize(true);
+
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
+
         mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setNestedScrollingEnabled(false);
 
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
+        final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts");
 
         // Attach a listener to read the data at our posts reference
         dbRef.addChildEventListener(new ChildEventListener()
@@ -92,18 +95,46 @@ public class FeedFragment extends Fragment
                 geoFire.getLocation(dataSnapshot.getKey(), new LocationCallback()
                 {
                     @Override
-                    public void onLocationResult(String key, GeoLocation location)
+                    public void onLocationResult(final String key, final GeoLocation location)
                     {
                         if (location != null)
                         {
-                            //add post to the adapater.
                             PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-                            FeedPost feedPost = new FeedPost(post.userID, key, new LatLng(location.latitude, location.longitude));
-                            posts.add(feedPost);
-                            //re-create the adapter.
-                            mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
-                            mRecyclerView.setAdapter(mAdapter);
-                            mRecyclerView.setNestedScrollingEnabled(false);
+
+                            //query uid for real name
+                            DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("users").child(post.userID);
+                            mRef.addListenerForSingleValueEvent(new ValueEventListener()
+                            {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot)
+                                {
+                                    if(dataSnapshot.exists())
+                                    {
+                                        //add post to the adapater.
+
+                                        PupAlertFirebase.User user = dataSnapshot.getValue(PupAlertFirebase.User.class);
+
+                                        FeedPost feedPost = new FeedPost(user.getname(), key, new LatLng(location.latitude, location.longitude));
+
+                                        posts.add(feedPost);
+                                        //re-create the adapter.
+                                        mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
+                                        mRecyclerView.setAdapter(mAdapter);
+                                        mRecyclerView.setNestedScrollingEnabled(false);
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError)
+                                {
+
+                                }
+                            });
+
+
                         }
                         else
                         {

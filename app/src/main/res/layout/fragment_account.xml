@@ -4,11 +4,39 @@
              android:layout_height="match_parent"
              tools:context="com.teammimosa.pupalert_android.AccountFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:id="@+id/account_signed_out"
+        android:layout_height="fill_parent">
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:id="@+id/account_signed_in"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/account_name"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+        <ImageView
+            android:id="@+id/account_pic"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop"/>
+
+    </RelativeLayout>
+
 
 </FrameLayout>
