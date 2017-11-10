@@ -34,7 +34,7 @@
                 android:layout_below="@+id/card_image"
                 android:src="@drawable/ic_place_black"
                 android:layout_marginTop="@dimen/margin_small"
-                android:tint="@color/cardview_marker" />
+                android:tint="#ffcf6f" />
 
             <TextView
                 android:id="@+id/card_location"
