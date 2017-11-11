@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.teammimosa.pupalert_android.util.PermissionUtils;
+import com.teammimosa.pupalert_android.util.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,16 +45,17 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
 {
     private MapView mMapView;
     public GoogleMap googleMap;
-    private LocationManager locationManager;
-    private static final long MIN_TIME = 400;
-    private static final float MIN_DISTANCE = 1000;
-
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
     private static final GeoLocation INITIAL_CENTER = new GeoLocation(51.574446, -17.031768); //Center of maps (kind of)
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     private Map<String,Marker> markers;
+
+    private LocationManager locationManager;
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final long MIN_TIME = 60000;
+    private static final float MIN_DISTANCE = 1000;
 
     /**
      * Use this factory method to create a new instance of

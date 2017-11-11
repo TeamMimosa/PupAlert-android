@@ -13,6 +13,8 @@ import java.util.Date;
  */
 public class Utils
 {
+    public static LatLng cachedLoc = new LatLng(0,0);
+
     /**
      * Gets a formatted timestamp for pushing to database.
      * @return
@@ -30,9 +32,8 @@ public class Utils
      * Gets a formatted timestamp for displaying on card view.
      * @return
      */
-    public static String getTimeStampForCardView()
+    public static String getTimeStampForCardView(Date date)
     {
-        Date date = new Date();
         //Format is: Wed Oct 18 2017 15:32:10 GMT-0400 (EDT)
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss)");
         String dateStr = sdf.format(date);

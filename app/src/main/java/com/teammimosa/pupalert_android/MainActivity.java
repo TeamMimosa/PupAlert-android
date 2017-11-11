@@ -1,5 +1,10 @@
 package com.teammimosa.pupalert_android;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -8,13 +13,17 @@ import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseApp;
 import com.teammimosa.pupalert_android.dummy.DummyContent;
+import com.teammimosa.pupalert_android.util.PermissionUtils;
+import com.teammimosa.pupalert_android.util.Utils;
 
 import java.lang.reflect.Field;
 
@@ -22,12 +31,18 @@ import java.lang.reflect.Field;
  * Our main activity that hosts the nav bar and all fragments.
  * @author Domenic Portuesi
  */
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements LocationListener
 {
     private static final String SELECTED_ITEM = "arg_selected_item";
 
     private BottomNavigationView mBottomNav;
     private int mSelectedItem;
+
+    private LocationManager locationManager;
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final long MIN_TIME = 60000;
+    private static final float MIN_DISTANCE = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,6 +76,18 @@ public class MainActivity extends AppCompatActivity
             selectedItem = mBottomNav.getMenu().getItem(0);
         }
         selectFragment(selectedItem);
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            // Permission to access the location is missing.
+            //ASSUMING the main activity as a appcompatactivity
+            PermissionUtils.requestPermission((AppCompatActivity) this, LOCATION_PERMISSION_REQUEST_CODE, android.Manifest.permission.ACCESS_FINE_LOCATION, true);
+        } else
+        {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+        }
     }
 
     @Override
@@ -162,5 +189,32 @@ public class MainActivity extends AppCompatActivity
         {
             actionBar.setTitle(text);
         }
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location)
+    {
+        //curLoc = new LatLng(location.getLatitude(), location.getLongitude());
+        Utils.cachedLoc = new LatLng(location.getLatitude(), location.getLongitude());
+        locationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras)
+    {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider)
+    {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider)
+    {
+
     }
 }
