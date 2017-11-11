@@ -120,18 +120,12 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                             Toast.makeText(getActivity(), "Post submitted!", Toast.LENGTH_SHORT).show();
 
                             //reload fragment
-                            Fragment frag = new NewPostFragment();
-                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.container, frag, frag.getTag());
-                            ft.commit();
+                            Utils.switchToFragment(getActivity(), new NewPostFragment());
                             break;
                         }
                         else
                         {
-                            Fragment frag = AccountFragment.newInstance();
-                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.container, frag, frag.getTag());
-                            ft.commit();
+                            Utils.switchToFragment(getActivity(), AccountFragment.newInstance());
                         }
                 }
             }
@@ -245,8 +239,6 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                 cameraButton.setImageURI(file);
                 cameraButton.setBackgroundResource(R.drawable.rounded);
                 //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-
             }
         }
 

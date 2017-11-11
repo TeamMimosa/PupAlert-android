@@ -27,12 +27,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.util.PermissionUtils;
+import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,12 +154,60 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
     //https://github.com/firebase/geofire-java/blob/master/examples/SFVehicles/SF%20Vehicles/src/main/java/com/firebase/sfvehicles/SFVehiclesActivity.java
 
     @Override
-    public void onKeyEntered(String key, GeoLocation location)
+    public void onKeyEntered(final String key, final GeoLocation location)
     {
-        // Add a new marker to the map
-        Marker marker = this.googleMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
-        this.markers.put(key, marker);
+        //check if marker is within 30 mins
+        final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.exists())
+                {
+                    final PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+                    //check for if its the last 30 mins
+                    String timeStamp = post.getttimestamp();
+                    Date timeStampDate = new Date();
+
+                    Date currentDate = new Date();
+                    Calendar calTimestampLo = Calendar.getInstance();
+                    calTimestampLo.setTime(currentDate);
+                    calTimestampLo.add(Calendar.MINUTE, -30);
+
+                    Calendar calTimestampHi = Calendar.getInstance();
+                    calTimestampHi.setTime(currentDate);
+
+                    try
+                    {
+                        timeStampDate = dateFormat.parse(timeStamp);
+                    }
+                    catch (ParseException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    Calendar calTimestamp = Calendar.getInstance();
+                    calTimestamp.setTime(timeStampDate);
+
+                    //add the post if the time is the last 30 mins
+                    if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
+                    {
+                        // Add a new marker to the map
+                        Marker marker = googleMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
+                        markers.put(key, marker);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
     }
 
     @Override

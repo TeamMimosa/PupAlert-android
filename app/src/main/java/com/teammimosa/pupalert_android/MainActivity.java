@@ -176,9 +176,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener
 
         if (frag != null)
         {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, frag, frag.getTag());
-            ft.commit();
+            Utils.switchToFragment(this, frag);
         }
     }
 

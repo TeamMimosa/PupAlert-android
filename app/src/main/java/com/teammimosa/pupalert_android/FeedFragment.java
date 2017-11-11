@@ -1,12 +1,6 @@
 package com.teammimosa.pupalert_android;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -19,36 +13,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.util.Util;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
-import com.firebase.geofire.LocationCallback;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.teammimosa.pupalert_android.util.PermissionUtils;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Fragment that demonstrates how to use CardView.
  */
-public class FeedFragment extends Fragment implements LocationListener, SwipeRefreshLayout.OnRefreshListener
+public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -109,7 +98,7 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
         swipeLayout.setColorSchemeResources(android.R.color.holo_orange_light);
         swipeLayout.setRefreshing(true);
 
-        loadCards();
+        loadCards(rootView);
 
         return rootView;
     }
@@ -129,12 +118,6 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
     }
 
     @Override
-    public void onLocationChanged(Location location)
-    {
-        loadCards();
-    }
-
-    @Override
     public void onRefresh()
     {
         //reload fragment
@@ -144,26 +127,7 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
         ft.commit();
     }
 
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras)
-    {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider)
-    {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider)
-    {
-
-    }
-
-    public void loadCards()
+    public void loadCards(View rootView)
     {
         DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
         GeoFire geoFire = new GeoFire(geoRef);
@@ -176,6 +140,20 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
                 @Override
                 public void onKeyEntered(final String key, final GeoLocation location)
                 {
+                    //get date ranges to be in
+
+                    Date date = new Date();
+                    Calendar queryRangeLow = Calendar.getInstance();
+                    queryRangeLow.setTime(date);
+                    queryRangeLow.add(Calendar.MINUTE, -30);
+
+                    Calendar queryRangeHi = Calendar.getInstance();
+                    queryRangeHi.setTime(date);
+
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String lo = dateFormat.format(queryRangeLow.getTime());
+                    String hi = dateFormat.format(queryRangeHi.getTime());
+
                     final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
                     dbRef.addListenerForSingleValueEvent(new ValueEventListener()
                     {
@@ -184,7 +162,7 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
                         {
                             if(dataSnapshot.exists())
                             {
-                                PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                                final PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
 
                                 //query uid for real name
                                 DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("users").child(post.userID);
@@ -195,16 +173,45 @@ public class FeedFragment extends Fragment implements LocationListener, SwipeRef
                                     {
                                         if(dataSnapshot.exists())
                                         {
-                                            //add post to the adapater.
-                                            PupAlertFirebase.User user = dataSnapshot.getValue(PupAlertFirebase.User.class);
+                                            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-                                            FeedPost feedPost = new FeedPost(user.getname(), key, new LatLng(location.latitude, location.longitude));
+                                            //check for if its the last 30 mins
+                                            String timeStamp = post.getttimestamp();
+                                            Date timeStampDate = new Date();
 
-                                            posts.add(feedPost);
-                                            //re-create the adapter.
-                                            mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
-                                            mRecyclerView.setAdapter(mAdapter);
-                                            mRecyclerView.setNestedScrollingEnabled(false);
+                                            Date currentDate = new Date();
+                                            Calendar calTimestampLo = Calendar.getInstance();
+                                            calTimestampLo.setTime(currentDate);
+                                            calTimestampLo.add(Calendar.MINUTE, -30);
+
+                                            Calendar calTimestampHi = Calendar.getInstance();
+                                            calTimestampHi.setTime(currentDate);
+
+                                            try
+                                            {
+                                                timeStampDate = dateFormat.parse(timeStamp);
+                                            }
+                                            catch (ParseException e)
+                                            {
+                                                e.printStackTrace();
+                                            }
+
+                                            Calendar calTimestamp = Calendar.getInstance();
+                                            calTimestamp.setTime(timeStampDate);
+
+                                            //add the post if the time is the last 30 mins
+                                            if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
+                                            {
+                                                //add post to the adapater.
+                                                PupAlertFirebase.User user = dataSnapshot.getValue(PupAlertFirebase.User.class);
+                                                FeedPost feedPost = new FeedPost(user.getname(), key, new LatLng(location.latitude, location.longitude));
+
+                                                posts.add(feedPost);
+                                                //re-create the adapter.
+                                                mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
+                                                mRecyclerView.setAdapter(mAdapter);
+                                                mRecyclerView.setNestedScrollingEnabled(false);
+                                            }
                                         }
                                     }
 
