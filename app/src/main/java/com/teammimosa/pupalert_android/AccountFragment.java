@@ -1,17 +1,25 @@
 package com.teammimosa.pupalert_android;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -129,9 +137,27 @@ public class AccountFragment extends Fragment implements View.OnClickListener
 
             TextView acct_name = rootView.findViewById(R.id.account_name);
             acct_name.setText(account.getDisplayName());
+
+            ImageView acct_pic = rootView.findViewById(R.id.account_picture_in);
+            Glide.with(this).load(account.getPhotoUrl()).into(acct_pic);
+
+            Button signOutBtn = rootView.findViewById(R.id.signout_button);
+            signOutBtn.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    FirebaseAuth.getInstance().signOut();
+                    gsic.revokeAccess();
+                    updateUI(null);
+                }
+            });
         }
         else
         {
+            rootView.findViewById(R.id.account_signed_out).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.account_signed_in).setVisibility(View.INVISIBLE);
+
             // Set the dimensions of the sign-in button.
             SignInButton signInButton = rootView.findViewById(R.id.sign_in_button);
             signInButton.setSize(SignInButton.SIZE_STANDARD);
