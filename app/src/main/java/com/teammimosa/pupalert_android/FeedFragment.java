@@ -152,7 +152,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     Calendar queryRangeHi = Calendar.getInstance();
                     queryRangeHi.setTime(date);
 
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    DateFormat dateFormat = Utils.dateFormat;
                     String lo = dateFormat.format(queryRangeLow.getTime());
                     String hi = dateFormat.format(queryRangeHi.getTime());
 
@@ -175,8 +175,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     {
                                         if(dataSnapshot.exists())
                                         {
-                                            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+                                            DateFormat dateFormat = Utils.dateFormat;
                                             //check for if its the last 30 mins
                                             String timeStamp = post.getttimestamp();
                                             Date timeStampDate = new Date();
@@ -207,7 +206,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                             {
                                                 //add post to the adapater.
                                                 PupAlertFirebase.User user = dataSnapshot.getValue(PupAlertFirebase.User.class);
-                                                FeedPost feedPost = new FeedPost(user.getname(), key, new LatLng(location.latitude, location.longitude));
+                                                FeedPost feedPost = new FeedPost(user.getname(), key, new LatLng(location.latitude, location.longitude), post.getttimestamp());
 
                                                 posts.add(feedPost);
                                                 //re-create the adapter.
@@ -215,7 +214,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 mRecyclerView.setAdapter(mAdapter);
                                                 mRecyclerView.setNestedScrollingEnabled(false);
 
-                                               mEmptyText.setVisibility(View.INVISIBLE);
+                                                mEmptyText.setVisibility(View.INVISIBLE);
                                             }
                                             else
                                             {
@@ -265,8 +264,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                 }
             });
+            
+            swipeLayout.setRefreshing(false);
         }
-
-        swipeLayout.setRefreshing(false);
+        else
+        {
+            swipeLayout.setRefreshing(true);
+        }
     }
 }

@@ -11,6 +11,7 @@ import com.google.maps.android.SphericalUtil;
 import com.teammimosa.pupalert_android.AccountFragment;
 import com.teammimosa.pupalert_android.R;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,6 +22,8 @@ import java.util.Date;
 public class Utils
 {
     public static LatLng cachedLoc = new LatLng(0,0);
+
+    public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * Gets a formatted timestamp for pushing to database.
@@ -33,8 +36,7 @@ public class Utils
         //SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)");
 
         //Format is: 2017-11-26 15:00
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateStr = sdf.format(date);
+        String dateStr = dateFormat.format(date);
         return dateStr;
     }
 

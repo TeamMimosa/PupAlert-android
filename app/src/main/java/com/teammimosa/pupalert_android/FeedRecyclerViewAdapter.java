@@ -14,8 +14,14 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.teammimosa.pupalert_android.util.Utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +36,7 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
         TextView postedBy;
         ImageView image;
         TextView location;
+        TextView minutesAgo;
 
         public DataObjectHolder(View itemView)
         {
@@ -37,6 +44,8 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
             postedBy = (TextView) itemView.findViewById(R.id.card_author);
             image = (ImageView) itemView.findViewById(R.id.card_image);
             location = (TextView)itemView.findViewById(R.id.card_location);
+            minutesAgo = (TextView) itemView.findViewById(R.id.card_minutes_ago);
+
             itemView.setOnClickListener(this);
         }
 
@@ -76,6 +85,31 @@ public class FeedRecyclerViewAdapter extends RecyclerView.Adapter<FeedRecyclerVi
     public void onBindViewHolder(DataObjectHolder holder, int position)
     {
         holder.postedBy.setText(mDataset.get(position).getPostedBy());
+
+        //get minutes ago posted
+        Date curDate = new Date();
+        Calendar curCal = Calendar.getInstance();
+        curCal.setTime(curDate);
+
+        Calendar postCal = Calendar.getInstance();
+        try
+        {
+            postCal.setTime(Utils.dateFormat.parse(mDataset.get(position).getTimestamp()));
+        }
+        catch (ParseException e)
+        {
+            postCal.setTime(curDate);
+            System.err.println("Could not parse out the timestamp!");
+            e.printStackTrace();
+        }
+
+        long difference = curCal.getTimeInMillis() - postCal.getTimeInMillis();
+        int minutes = (int) (difference/ (1000*60));
+
+        if(minutes > 0)
+            holder.minutesAgo.setText(minutes + " minutes ago");
+        else
+            holder.minutesAgo.setText("very recently");
 
         //load the image with glide
         StorageReference storRef = FirebaseStorage.getInstance().getReference().child("posts/" + mDataset.get(position).getImageKey());
