@@ -7,7 +7,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,7 +47,7 @@ import static android.app.Activity.RESULT_OK;
  *
  * @author Sydney Micklas, Domenic Portuesi
  */
-public class NewPostFragment extends Fragment implements View.OnClickListener
+public class FragmentNewPost extends Fragment implements View.OnClickListener
 {
     private FusedLocationProviderClient mFusedLocationClient;
     private double userLat = 0;
@@ -120,12 +118,12 @@ public class NewPostFragment extends Fragment implements View.OnClickListener
                             Toast.makeText(getActivity(), "Post submitted!", Toast.LENGTH_SHORT).show();
 
                             //reload fragment
-                            Utils.switchToFragment(getActivity(), new NewPostFragment());
+                            Utils.switchToFragment(getActivity(), new FragmentNewPost());
                             break;
                         }
                         else
                         {
-                            Utils.switchToFragment(getActivity(), AccountFragment.newInstance());
+                            Utils.switchToFragment(getActivity(), FragmentAccount.newInstance());
                         }
                 }
             }

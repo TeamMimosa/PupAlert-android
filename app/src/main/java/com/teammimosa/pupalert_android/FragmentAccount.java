@@ -1,25 +1,18 @@
 package com.teammimosa.pupalert_android;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DecodeFormat;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -40,13 +33,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 
-import java.util.concurrent.Executor;
-
 /**
  * Signs in with google, renders account ui
  * @author Domenic
  */
-public class AccountFragment extends Fragment implements View.OnClickListener
+public class FragmentAccount extends Fragment implements View.OnClickListener
 {
     private GoogleSignInClient gsic;
     private FirebaseAuth mAuth;
@@ -56,13 +47,13 @@ public class AccountFragment extends Fragment implements View.OnClickListener
 
     PupAlertFirebase database;
 
-    public AccountFragment()
+    public FragmentAccount()
     {
     }
 
-    public static AccountFragment newInstance()
+    public static FragmentAccount newInstance()
     {
-        AccountFragment fragment = new AccountFragment();
+        FragmentAccount fragment = new FragmentAccount();
         fragment.setRetainInstance(true);
         return fragment;
     }

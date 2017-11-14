@@ -1,6 +1,5 @@
 package com.teammimosa.pupalert_android.util;
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -9,7 +8,6 @@ import android.support.v4.app.FragmentTransaction;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
-import com.teammimosa.pupalert_android.AccountFragment;
 import com.teammimosa.pupalert_android.R;
 
 import java.text.DateFormat;

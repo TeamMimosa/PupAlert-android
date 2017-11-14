@@ -12,7 +12,6 @@ import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +19,6 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.FirebaseApp;
-import com.teammimosa.pupalert_android.dummy.DummyContent;
 import com.teammimosa.pupalert_android.util.PermissionUtils;
 import com.teammimosa.pupalert_android.util.Utils;
 
@@ -31,7 +28,7 @@ import java.lang.reflect.Field;
  * Our main activity that hosts the nav bar and all fragments.
  * @author Domenic Portuesi
  */
-public class MainActivity extends AppCompatActivity implements LocationListener
+public class ActivityMain extends AppCompatActivity implements LocationListener
 {
     private static final String SELECTED_ITEM = "arg_selected_item";
 
@@ -149,16 +146,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         switch (item.getItemId())
         {
             case R.id.menu_map:
-                frag = MapsFragment.newInstance();
+                frag = FragmentMap.newInstance();
                 break;
             case R.id.menu_new_post:
-                frag = new NewPostFragment();
+                frag = new FragmentNewPost();
                 break;
             case R.id.menu_feed:
-                frag = FeedFragment.newInstance();
+                frag = FragmentFeed.newInstance();
                 break;
             case R.id.menu_user:
-                frag = AccountFragment.newInstance();
+                frag = FragmentAccount.newInstance();
                 break;
         }
 
@@ -196,11 +193,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener
         Utils.cachedLoc = new LatLng(location.getLatitude(), location.getLongitude());
         locationManager.removeUpdates(this);
 
+        //This is to stop refreshing the feed once it finds a location!
         Fragment f = Utils.getCurrentFragment(this);
-        if (f instanceof FeedFragment)
+
+        if (f instanceof FragmentFeed)
         {
-            ((FeedFragment) f).swipeLayout.setRefreshing(false);
-            Utils.switchToFragment(this, FeedFragment.newInstance());
+            ((FragmentFeed) f).swipeLayout.setRefreshing(false);
+            Utils.switchToFragment(this, FragmentFeed.newInstance());
         }
     }
 

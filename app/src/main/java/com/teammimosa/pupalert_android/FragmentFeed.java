@@ -1,12 +1,8 @@
 package com.teammimosa.pupalert_android;
 
-import android.location.LocationListener;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -24,14 +19,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +32,7 @@ import java.util.Date;
 /**
  * Fragment that demonstrates how to use CardView.
  */
-public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
+public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -58,14 +51,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
      *
      * @return A new instance of fragment NotificationFragment.
      */
-    public static FeedFragment newInstance()
+    public static FragmentFeed newInstance()
     {
-        FeedFragment fragment = new FeedFragment();
+        FragmentFeed fragment = new FragmentFeed();
         fragment.setRetainInstance(true);
         return fragment;
     }
 
-    public FeedFragment() {}
+    public FragmentFeed() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -128,7 +121,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     {
         //reload fragment
 
-        Utils.switchToFragment(getActivity(), FeedFragment.newInstance());
+        Utils.switchToFragment(getActivity(), FragmentFeed.newInstance());
     }
 
     public void loadCards(View rootView)

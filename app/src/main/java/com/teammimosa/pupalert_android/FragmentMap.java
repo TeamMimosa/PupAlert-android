@@ -49,7 +49,7 @@ import java.util.Map;
  *
  * @author Domenic Portuesi
  */
-public class MapsFragment extends Fragment implements LocationListener, GeoQueryEventListener
+public class FragmentMap extends Fragment implements LocationListener, GeoQueryEventListener
 {
     private MapView mMapView;
     public GoogleMap googleMap;
@@ -71,14 +71,14 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
      *
      * @return A new instance of fragment NotificationFragment.
      */
-    public static MapsFragment newInstance()
+    public static FragmentMap newInstance()
     {
-        MapsFragment fragment = new MapsFragment();
+        FragmentMap fragment = new FragmentMap();
         fragment.setRetainInstance(true);
         return fragment;
     }
 
-    public MapsFragment(){}
+    public FragmentMap(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -167,7 +167,7 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
                 if(dataSnapshot.exists())
                 {
                     final PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    DateFormat dateFormat = Utils.dateFormat;
 
                     //check for if its the last 30 mins
                     String timeStamp = post.getttimestamp();
