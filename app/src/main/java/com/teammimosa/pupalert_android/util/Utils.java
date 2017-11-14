@@ -3,6 +3,7 @@ package com.teammimosa.pupalert_android.util;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -67,6 +68,14 @@ public class Utils
         FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, frag, frag.getTag());
         ft.commit();
+    }
+
+    public static Fragment getCurrentFragment(FragmentActivity activity)
+    {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        int stackCount = fragmentManager.getBackStackEntryCount();
+        if( fragmentManager.getFragments() != null ) return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount );
+        else return null;
     }
 
 }

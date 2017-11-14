@@ -105,6 +105,10 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
             {
                 googleMap = mMap;
                 enableMyLocation();
+
+                //zoom to location when fragment is created
+                if(Utils.cachedLoc.longitude != 0)
+                    animateCameraTo(new LatLng(Utils.cachedLoc.latitude, Utils.cachedLoc.longitude));
             }
         });
 
@@ -124,10 +128,7 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
     {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        //move camera to user position
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-        googleMap.animateCamera(cameraUpdate);
-        locationManager.removeUpdates(this);
+        animateCameraTo(latLng);
     }
 
     /**
@@ -238,6 +239,14 @@ public class MapsFragment extends Fragment implements LocationListener, GeoQuery
     public void onGeoQueryError(DatabaseError error)
     {
 
+    }
+
+    private void animateCameraTo(LatLng latLng)
+    {
+        //move camera to user position
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        googleMap.animateCamera(cameraUpdate);
+        locationManager.removeUpdates(this);
     }
 
     //FOR FUTURE USE:

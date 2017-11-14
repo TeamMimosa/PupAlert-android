@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.util.Util;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -46,7 +47,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private TextView mEmptyText;
 
-    private SwipeRefreshLayout swipeLayout;
+    public SwipeRefreshLayout swipeLayout;
 
     private ArrayList<FeedPost> posts;
 
@@ -126,6 +127,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onRefresh()
     {
         //reload fragment
+
         Utils.switchToFragment(getActivity(), FeedFragment.newInstance());
     }
 
@@ -264,7 +266,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                 }
             });
-            
+
             swipeLayout.setRefreshing(false);
         }
         else

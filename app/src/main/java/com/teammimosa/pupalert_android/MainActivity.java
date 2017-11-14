@@ -193,9 +193,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener
     @Override
     public void onLocationChanged(Location location)
     {
-        //curLoc = new LatLng(location.getLatitude(), location.getLongitude());
         Utils.cachedLoc = new LatLng(location.getLatitude(), location.getLongitude());
         locationManager.removeUpdates(this);
+
+        Fragment f = Utils.getCurrentFragment(this);
+        if (f instanceof FeedFragment)
+        {
+            ((FeedFragment) f).swipeLayout.setRefreshing(false);
+            Utils.switchToFragment(this, FeedFragment.newInstance());
+        }
     }
 
     @Override
