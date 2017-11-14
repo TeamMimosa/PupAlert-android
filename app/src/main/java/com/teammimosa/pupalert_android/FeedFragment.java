@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -42,6 +43,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private TextView mEmptyText;
 
     private SwipeRefreshLayout swipeLayout;
 
@@ -87,6 +90,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setNestedScrollingEnabled(false);
 
+        mEmptyText = rootView.findViewById(R.id.feed_no_data);
+
         // Code to Add an item with default animation
         //((MyRecyclerViewAdapter) mAdapter).addItem(obj, index);
 
@@ -121,17 +126,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onRefresh()
     {
         //reload fragment
-        Fragment frag = FeedFragment.newInstance();
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, frag, frag.getTag());
-        ft.commit();
+        Utils.switchToFragment(getActivity(), FeedFragment.newInstance());
     }
 
     public void loadCards(View rootView)
     {
         DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
         GeoFire geoFire = new GeoFire(geoRef);
-        if(Utils.cachedLoc.longitude != 0)
+        if(Utils.cachedLoc.longitude != 0) //check if the activity retrieved the location
         {
             //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(curLoc.latitude, curLoc.longitude), 10);
             GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(Utils.cachedLoc.latitude, Utils.cachedLoc.longitude), 10);
@@ -199,6 +201,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                             Calendar calTimestamp = Calendar.getInstance();
                                             calTimestamp.setTime(timeStampDate);
 
+                                            System.out.println("lo: " + calTimestampLo.toString() + " cur: " + calTimestamp + " hi: " + calTimestampHi);
                                             //add the post if the time is the last 30 mins
                                             if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
                                             {
@@ -211,6 +214,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 mAdapter = new FeedRecyclerViewAdapter(posts, getActivity());
                                                 mRecyclerView.setAdapter(mAdapter);
                                                 mRecyclerView.setNestedScrollingEnabled(false);
+
+                                               mEmptyText.setVisibility(View.INVISIBLE);
+                                            }
+                                            else
+                                            {
+                                                mEmptyText.setVisibility(View.VISIBLE);
                                             }
                                         }
                                     }
