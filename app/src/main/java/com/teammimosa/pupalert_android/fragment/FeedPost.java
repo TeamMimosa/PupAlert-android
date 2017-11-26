@@ -1,4 +1,4 @@
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.fragment;
 
 import com.google.android.gms.maps.model.LatLng;
 

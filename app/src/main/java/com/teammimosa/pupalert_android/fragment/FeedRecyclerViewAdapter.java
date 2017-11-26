@@ -1,4 +1,4 @@
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.fragment;
 
 import android.content.Context;
 import android.location.Address;
@@ -14,11 +14,10 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.teammimosa.pupalert_android.R;
 import com.teammimosa.pupalert_android.util.Utils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;

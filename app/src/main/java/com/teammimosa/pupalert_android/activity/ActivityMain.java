@@ -1,4 +1,4 @@
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.activity;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,7 +23,11 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.teammimosa.pupalert_android.R;
+import com.teammimosa.pupalert_android.fragment.FragmentAccount;
+import com.teammimosa.pupalert_android.fragment.FragmentFeed;
+import com.teammimosa.pupalert_android.fragment.FragmentMap;
+import com.teammimosa.pupalert_android.fragment.FragmentNewPost;
 import com.teammimosa.pupalert_android.services.ServiceBackgroundLocation;
 import com.teammimosa.pupalert_android.util.PermissionUtils;
 import com.teammimosa.pupalert_android.util.Utils;

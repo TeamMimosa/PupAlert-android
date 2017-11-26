@@ -1,4 +1,4 @@
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -31,6 +31,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.teammimosa.pupalert_android.R;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 

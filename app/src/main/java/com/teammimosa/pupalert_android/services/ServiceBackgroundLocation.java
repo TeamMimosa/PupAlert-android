@@ -1,6 +1,5 @@
 package com.teammimosa.pupalert_android.services;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,7 +14,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.teammimosa.pupalert_android.ActivityMain;
+import com.teammimosa.pupalert_android.activity.ActivityMain;
 import com.teammimosa.pupalert_android.R;
 import com.teammimosa.pupalert_android.util.Utils;
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.teammimosa.pupalert_android.FragmentNewPost"
+    tools:context="com.teammimosa.pupalert_android.fragment.FragmentNewPost"
     tools:showIn="@layout/fragment_camera">
 
 </android.support.constraint.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.teammimosa.pupalert_android;
+package com.teammimosa.pupalert_android.fragment;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.teammimosa.pupalert_android.R;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
