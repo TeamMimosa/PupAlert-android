@@ -235,8 +235,9 @@ public class FragmentNewPost extends Fragment implements View.OnClickListener
             if (resultCode == RESULT_OK){
                 postButton.setEnabled(true);
                 cameraButton.setImageURI(file);
-                cameraButton.setBackgroundResource(R.drawable.rounded);
-                //button.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                //cameraButton.setBackgroundResource(R.drawable.rounded);
+                cameraButton.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
             }
         }
 
@@ -245,7 +246,7 @@ public class FragmentNewPost extends Fragment implements View.OnClickListener
                postButton.setEnabled(true);
                 file = data.getData();
                 cameraButton.setImageURI(file);
-                cameraButton.setBackgroundResource(R.drawable.rounded);
+                //cameraButton.setBackgroundResource(R.drawable.rounded);
             }
         }
         //Set text to cur loc
