@@ -1,10 +1,14 @@
 package com.teammimosa.pupalert_android;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -19,6 +23,8 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.teammimosa.pupalert_android.services.ServiceBackgroundLocation;
 import com.teammimosa.pupalert_android.util.PermissionUtils;
 import com.teammimosa.pupalert_android.util.Utils;
 
@@ -45,6 +51,7 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         //https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
@@ -85,6 +92,21 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
+
+        //create notification channels
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            // Create channel to show notifications.
+            String channelId  = getString(R.string.default_notification_channel_id);
+            String channelName = getString(R.string.default_notification_channel_name);
+            NotificationManager notificationManager =
+                    getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(new NotificationChannel(channelId,
+                    channelName, NotificationManager.IMPORTANCE_LOW));
+        }
+
+        //start the background location gathering.
+        startService(new Intent(this, ServiceBackgroundLocation.class));
     }
 
     @Override
@@ -185,7 +207,6 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
             actionBar.setTitle(text);
         }
     }
-
 
     @Override
     public void onLocationChanged(Location location)
