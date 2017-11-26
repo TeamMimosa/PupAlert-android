@@ -14,7 +14,7 @@
             android:text="Sign in with Google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="356dp"
+            android:layout_marginTop="400dp"
             android:layout_centerHorizontal="true"
             />
 
@@ -69,7 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="400dp"
-            android:text="Sign out " />
+            android:backgroundTint="#ffffff"
+            android:text="Sign out" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             xmlns:app="http://schemas.android.com/apk/res-auto"
