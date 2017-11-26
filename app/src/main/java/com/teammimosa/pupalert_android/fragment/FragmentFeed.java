@@ -121,7 +121,6 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onRefresh()
     {
         //reload fragment
-
         Utils.switchToFragment(getActivity(), FragmentFeed.newInstance());
     }
 
@@ -211,10 +210,12 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 mRecyclerView.setNestedScrollingEnabled(false);
 
                                                 mEmptyText.setVisibility(View.INVISIBLE);
+                                                mRecyclerView.setVisibility(View.VISIBLE);
                                             }
                                             else
                                             {
                                                 mEmptyText.setVisibility(View.VISIBLE);
+                                                mRecyclerView.setVisibility(View.INVISIBLE);
                                             }
                                         }
                                     }
@@ -251,7 +252,7 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
                 @Override
                 public void onGeoQueryReady()
                 {
-
+                    mEmptyText.setVisibility(View.VISIBLE);
                 }
 
                 @Override
