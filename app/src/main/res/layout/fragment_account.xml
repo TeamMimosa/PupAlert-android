@@ -14,7 +14,7 @@
             android:text="Sign in with Google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="356dp"
+            android:layout_marginTop="400dp"
             android:layout_centerHorizontal="true"
             />
 
@@ -42,60 +42,57 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="fill_parent"
         android:id="@+id/account_signed_in"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
         <TextView
             android:id="@+id/account_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="280dp"
-            android:layout_centerHorizontal="true"
-            android:textSize="25dp"
-            android:text= "name name name name "
-            />
-
-        <TextView
-            android:id="@+id/rank_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="325dp"
-            android:text= "rank rank rank rank rank rank "/>
+            android:text="name name name name "
+            android:textSize="25dp" />
 
         <TextView
             android:id="@+id/total_posts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="xxxx total posts"
-            android:layout_marginTop="350dp"/>
+            android:layout_marginTop="350dp"
+            android:text="xxxx total posts" />
 
         <Button
-            android:id = "@+id/signout_button"
+            android:id="@+id/signout_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="375dp"
-            android:text="Sign out "/>
+            android:layout_marginTop="400dp"
+            android:backgroundTint="#ffffff"
+            android:text="Sign out" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/account_picture_in"
+            android:layout_width="225dp"
+            android:layout_height="225dp"
+            android:layout_marginTop="35dp"
+            app:civ_border_width="2dp"
+            android:scaleType="centerCrop"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
         <View
             android:layout_width="225dp"
             android:layout_height="225dp"
-            android:layout_marginTop="35dp"
-            android:layout_gravity="center"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/circular"
-            />
+            android:layout_gravity="center"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/circular" />
 
-        <ImageView
-            android:id="@+id/account_picture_in"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="40dp"
-            android:layout_centerHorizontal="true" />
+
+
 
 
     </RelativeLayout>
