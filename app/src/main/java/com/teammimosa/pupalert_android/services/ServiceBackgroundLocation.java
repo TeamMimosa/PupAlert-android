@@ -269,7 +269,7 @@ public class ServiceBackgroundLocation extends Service
      *
      * @param messageBody body to put in notification bar.
      */
-    public void createNotification(String messageBody)
+    private void createNotification(String messageBody)
     {
         Intent intent = new Intent(this, ActivityMain.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -292,4 +292,18 @@ public class ServiceBackgroundLocation extends Service
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
+    /*
+    private int getNotificationIcon(int entry)
+    {
+        if (entry.targetSdk >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            entry.icon.setColorFilter(mContext.getResources().getColor(android.R.color.white));
+        }
+        else
+        {
+            entry.icon.setColorFilter(null);
+        }
+    }
+    */
 }

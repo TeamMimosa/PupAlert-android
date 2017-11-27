@@ -209,12 +209,10 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 mRecyclerView.setNestedScrollingEnabled(false);
 
                                                 mEmptyText.setVisibility(View.INVISIBLE);
-                                                mRecyclerView.setVisibility(View.VISIBLE);
                                             }
                                             else
                                             {
                                                 mEmptyText.setVisibility(View.VISIBLE);
-                                                mRecyclerView.setVisibility(View.INVISIBLE);
                                             }
                                         }
                                     }
@@ -251,7 +249,6 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
                 @Override
                 public void onGeoQueryReady()
                 {
-                    mEmptyText.setVisibility(View.VISIBLE);
                 }
 
                 @Override
@@ -262,11 +259,15 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
             });
 
             swipeLayout.setRefreshing(false);
-
+            if(!posts.isEmpty())
+            {
+                mEmptyText.setVisibility(View.INVISIBLE);
+            }
         }
         else
         {
             swipeLayout.setRefreshing(true);
+            mEmptyText.setVisibility(View.INVISIBLE);
         }
     }
 }
