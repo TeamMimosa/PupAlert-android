@@ -280,7 +280,7 @@ public class ServiceBackgroundLocation extends Service
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.icon)
+                        .setSmallIcon(R.mipmap.ic_app)
                         .setContentTitle("Pup Alert")
                         .setContentText(messageBody)
                         .setAutoCancel(true)

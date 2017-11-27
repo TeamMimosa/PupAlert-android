@@ -262,6 +262,7 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
             });
 
             swipeLayout.setRefreshing(false);
+
         }
         else
         {
