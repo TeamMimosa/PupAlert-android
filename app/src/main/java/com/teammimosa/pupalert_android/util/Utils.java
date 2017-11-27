@@ -20,6 +20,7 @@ import java.util.Date;
  */
 public class Utils
 {
+    public static int FEED_LOCATION_RADIUS = 10; //in km
     public static LatLng cachedLoc = new LatLng(0,0);
 
     public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

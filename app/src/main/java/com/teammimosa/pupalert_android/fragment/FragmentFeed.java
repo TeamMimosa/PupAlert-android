@@ -131,7 +131,7 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
         if(Utils.cachedLoc.longitude != 0) //check if the activity retrieved the location
         {
             //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(curLoc.latitude, curLoc.longitude), 10);
-            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(Utils.cachedLoc.latitude, Utils.cachedLoc.longitude), 10);
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(Utils.cachedLoc.latitude, Utils.cachedLoc.longitude), Utils.FEED_LOCATION_RADIUS);
             geoQuery.addGeoQueryEventListener(new GeoQueryEventListener()
             {
                 @Override
@@ -195,7 +195,6 @@ public class FragmentFeed extends Fragment implements SwipeRefreshLayout.OnRefre
                                             Calendar calTimestamp = Calendar.getInstance();
                                             calTimestamp.setTime(timeStampDate);
 
-                                            System.out.println("lo: " + calTimestampLo.toString() + " cur: " + calTimestamp + " hi: " + calTimestampHi);
                                             //add the post if the time is the last 30 mins
                                             if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
                                             {
