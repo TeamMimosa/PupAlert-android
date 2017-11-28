@@ -152,7 +152,7 @@ public class FragmentAccount extends Fragment implements View.OnClickListener
 
             // Set the dimensions of the sign-in button.
             SignInButton signInButton = rootView.findViewById(R.id.sign_in_button);
-            signInButton.setSize(SignInButton.SIZE_STANDARD);
+            signInButton.setSize(SignInButton.SIZE_WIDE);
             signInButton.setOnClickListener(this);
         }
     }

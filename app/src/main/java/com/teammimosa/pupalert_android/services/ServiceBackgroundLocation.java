@@ -10,9 +10,9 @@ import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.view.View;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -27,13 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.activity.ActivityMain;
 import com.teammimosa.pupalert_android.R;
-import com.teammimosa.pupalert_android.fragment.FeedPost;
-import com.teammimosa.pupalert_android.fragment.FeedRecyclerViewAdapter;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,32 +42,34 @@ import java.util.Date;
 public class ServiceBackgroundLocation extends Service
 {
     private LocationManager mLocationManager = null;
+    private Location mLastLocation;
     private static final int LOCATION_INTERVAL = (1000) * 60 * 30;
     private static final float LOCATION_DISTANCE = 1000;
 
     private class LocationListener implements android.location.LocationListener
     {
-        Location mLastLocation;
-
         public LocationListener(String provider)
         {
             mLastLocation = new Location(provider);
-            Utils.cachedLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            //filteredCreateNotification();
         }
 
         @Override
         public void onLocationChanged(Location location)
         {
+            Location prevLoc = mLastLocation;
             mLastLocation.set(location);
             Utils.cachedLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            filteredCreateNotification();
+
+            //if your location changed
+            if (!mLastLocation.equals(prevLoc))
+            {
+                createFirebaseNotificationListeners();
+            }
         }
 
         @Override
         public void onProviderDisabled(String provider)
         {
-
         }
 
         @Override
@@ -80,108 +81,6 @@ public class ServiceBackgroundLocation extends Service
         public void onStatusChanged(String provider, int status, Bundle extras)
         {
         }
-
-        private void filteredCreateNotification()
-        {
-            //createNotification("test body");
-            if(mLastLocation.getLatitude() != 0.0)
-            {
-                FirebaseApp.initializeApp(getApplicationContext());
-                DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
-                GeoFire geoFire = new GeoFire(geoRef);
-
-                //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(curLoc.latitude, curLoc.longitude), 10);
-                GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), Utils.FEED_LOCATION_RADIUS);
-                geoQuery.addGeoQueryEventListener(new GeoQueryEventListener()
-                {
-                    @Override
-                    public void onKeyEntered(final String key, final GeoLocation location)
-                    {
-                        //get date ranges to be in
-                        Date date = new Date();
-                        Calendar queryRangeLow = Calendar.getInstance();
-                        queryRangeLow.setTime(date);
-                        queryRangeLow.add(Calendar.MINUTE, -30);
-
-                        Calendar queryRangeHi = Calendar.getInstance();
-                        queryRangeHi.setTime(date);
-
-                        DateFormat dateFormat = Utils.dateFormat;
-                        String lo = dateFormat.format(queryRangeLow.getTime());
-                        String hi = dateFormat.format(queryRangeHi.getTime());
-
-                        final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
-                        dbRef.addListenerForSingleValueEvent(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot)
-                            {
-                                if(dataSnapshot.exists())
-                                {
-                                    final PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
-                                    DateFormat dateFormat = Utils.dateFormat;
-                                    //check for if its the last 30 mins
-                                    String timeStamp = post.getttimestamp();
-                                    Date timeStampDate = new Date();
-
-                                    Date currentDate = new Date();
-                                    Calendar calTimestampLo = Calendar.getInstance();
-                                    calTimestampLo.setTime(currentDate);
-                                    calTimestampLo.add(Calendar.MINUTE, -30);
-
-                                    Calendar calTimestampHi = Calendar.getInstance();
-                                    calTimestampHi.setTime(currentDate);
-
-                                    try
-                                    {
-                                        timeStampDate = dateFormat.parse(timeStamp);
-                                    }
-                                    catch (ParseException e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-
-                                    Calendar calTimestamp = Calendar.getInstance();
-                                    calTimestamp.setTime(timeStampDate);
-
-                                    //add the post if the time is the last 30 mins
-                                    if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
-                                    {
-                                        createNotification("New pups in your area!");
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError)
-                            {
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onKeyExited(String key)
-                    {
-                    }
-
-                    @Override
-                    public void onKeyMoved(String key, GeoLocation location)
-                    {
-                    }
-
-                    @Override
-                    public void onGeoQueryReady()
-                    {
-                    }
-
-                    @Override
-                    public void onGeoQueryError(DatabaseError error)
-                    {
-                    }
-                });
-            }
-        }
-
     }
 
     LocationListener[] mLocationListeners;
@@ -196,6 +95,7 @@ public class ServiceBackgroundLocation extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         super.onStartCommand(intent, flags, startId);
+
         return START_STICKY;
     }
 
@@ -261,6 +161,108 @@ public class ServiceBackgroundLocation extends Service
         if (mLocationManager == null)
         {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
+    }
+
+    private void createFirebaseNotificationListeners()
+    {
+        if(mLastLocation.getLatitude() != 0.0)
+        {
+            FirebaseApp.initializeApp(getApplicationContext());
+            DatabaseReference geoRef = FirebaseDatabase.getInstance().getReference("geofire");
+            GeoFire geoFire = new GeoFire(geoRef);
+
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), Utils.FEED_LOCATION_RADIUS);
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener()
+            {
+
+                @Override
+                public void onKeyEntered(final String key, final GeoLocation location)
+                {
+                    //get date ranges to be in
+                    Date date = new Date();
+                    Calendar queryRangeLow = Calendar.getInstance();
+                    queryRangeLow.setTime(date);
+                    queryRangeLow.add(Calendar.MINUTE, -30);
+
+                    Calendar queryRangeHi = Calendar.getInstance();
+                    queryRangeHi.setTime(date);
+
+                    DateFormat dateFormat = Utils.dateFormat;
+                    String lo = dateFormat.format(queryRangeLow.getTime());
+                    String hi = dateFormat.format(queryRangeHi.getTime());
+
+                    final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
+                    dbRef.addListenerForSingleValueEvent(new ValueEventListener()
+                    {
+
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot)
+                        {
+                            if(dataSnapshot.exists())
+                            {
+                                final PupAlertFirebase.Post post = dataSnapshot.getValue(PupAlertFirebase.Post.class);
+                                DateFormat dateFormat = Utils.dateFormat;
+                                //check for if its the last 30 mins
+                                String timeStamp = post.getttimestamp();
+                                Date timeStampDate = new Date();
+
+                                Date currentDate = new Date();
+                                Calendar calTimestampLo = Calendar.getInstance();
+                                calTimestampLo.setTime(currentDate);
+                                calTimestampLo.add(Calendar.MINUTE, -30);
+
+                                Calendar calTimestampHi = Calendar.getInstance();
+                                calTimestampHi.setTime(currentDate);
+
+                                try
+                                {
+                                    timeStampDate = dateFormat.parse(timeStamp);
+                                }
+                                catch (ParseException e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                Calendar calTimestamp = Calendar.getInstance();
+                                calTimestamp.setTime(timeStampDate);
+
+                                //add the post if the time is the last 30 mins
+                                if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
+                                {
+                                    if(!Utils.isAppRunning(getApplicationContext(), "com.teammimosa.pupalert_android"))
+                                        createNotification("New pups in your area!");
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError)
+                        {
+                        }
+                    });
+                }
+
+                @Override
+                public void onKeyExited(String key)
+                {
+                }
+
+                @Override
+                public void onKeyMoved(String key, GeoLocation location)
+                {
+                }
+
+                @Override
+                public void onGeoQueryReady()
+                {
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error)
+                {
+                }
+            });
         }
     }
 
