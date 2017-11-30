@@ -64,8 +64,6 @@ public class FragmentMap extends Fragment implements LocationListener, GeoQueryE
     private LocationManager locationManager;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static final long MIN_TIME = 60000;
-    private static final float MIN_DISTANCE = 1000;
 
     /**
      * Use this factory method to create a new instance of
@@ -150,7 +148,7 @@ public class FragmentMap extends Fragment implements LocationListener, GeoQueryE
             googleMap.setMyLocationEnabled(true);
 
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Utils.MIN_LOCATION_CHECK_TIME, Utils.MIN_LOCATION_DISTANCE_CHECK, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
     }
 

@@ -28,6 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Utils
 {
     public static int FEED_LOCATION_RADIUS = 10; //in km
+    public static int MIN_LOCATION_CHECK_TIME = 1000 * 60 * 60; //1.5 hour intervals
+    public static final float MIN_LOCATION_DISTANCE_CHECK = 5000;
+
     public static LatLng cachedLoc = new LatLng(0,0);
 
     public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -49,8 +49,6 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
     private LocationManager locationManager;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static final long MIN_TIME = 60000;
-    private static final float MIN_DISTANCE = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -95,7 +93,7 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
         } else
         {
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Utils.MIN_LOCATION_CHECK_TIME, Utils.MIN_LOCATION_DISTANCE_CHECK, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
         }
 
         //create notification channels
@@ -130,7 +128,7 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Utils.MIN_LOCATION_CHECK_TIME, Utils.MIN_LOCATION_DISTANCE_CHECK, this);
 
                 } else
                 {

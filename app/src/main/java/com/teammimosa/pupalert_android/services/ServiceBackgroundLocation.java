@@ -32,6 +32,7 @@ import com.teammimosa.pupalert_android.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,8 +44,6 @@ public class ServiceBackgroundLocation extends Service
 {
     private LocationManager mLocationManager = null;
     private Location mLastLocation;
-    private static final int LOCATION_INTERVAL = (1000) * 60 * 60;
-    private static final float LOCATION_DISTANCE = 5000;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -52,12 +51,10 @@ public class ServiceBackgroundLocation extends Service
         {
             mLastLocation = new Location(provider);
         }
-        public Location prevLoc = new Location("pupalert");
 
         @Override
         public void onLocationChanged(Location location)
         {
-            //Location prevLoc = mLastLocation;
             mLastLocation.set(location);
             Utils.cachedLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
@@ -105,7 +102,7 @@ public class ServiceBackgroundLocation extends Service
         try
         {
             mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    LocationManager.NETWORK_PROVIDER, Utils.MIN_LOCATION_CHECK_TIME, Utils.MIN_LOCATION_DISTANCE_CHECK,
                     mLocationListener);
         } catch (java.lang.SecurityException ex)
         {
@@ -166,7 +163,6 @@ public class ServiceBackgroundLocation extends Service
                     final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
                     dbRef.addListenerForSingleValueEvent(new ValueEventListener()
                     {
-
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot)
                         {
@@ -201,7 +197,6 @@ public class ServiceBackgroundLocation extends Service
                                 //add the post if the time is the last 30 mins
                                 if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
                                 {
-                                    //if(!VisibilityManager.getIsVisible())
                                     createNotification("New pups in your area!");
                                 }
                             }
