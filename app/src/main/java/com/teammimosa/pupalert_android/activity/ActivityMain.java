@@ -259,6 +259,20 @@ public class ActivityMain extends AppCompatActivity implements LocationListener
     }
 
     @Override
+    public void onPause()
+    {
+        ServiceBackgroundLocation.isAppOpen = false;
+        super.onPause();
+    }
+
+    @Override
+    public void onResume()
+    {
+        ServiceBackgroundLocation.isAppOpen = true;
+        super.onResume();
+    }
+
+    @Override
     public void onStatusChanged(String provider, int status, Bundle extras)
     {
 

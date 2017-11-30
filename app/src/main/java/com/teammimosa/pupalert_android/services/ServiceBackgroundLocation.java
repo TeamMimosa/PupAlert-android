@@ -27,12 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.activity.ActivityMain;
 import com.teammimosa.pupalert_android.R;
+import com.teammimosa.pupalert_android.fragment.FragmentNewPost;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
 import com.teammimosa.pupalert_android.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -44,6 +44,8 @@ public class ServiceBackgroundLocation extends Service
 {
     private LocationManager mLocationManager = null;
     private Location mLastLocation;
+
+    public static boolean isAppOpen = true;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -147,21 +149,8 @@ public class ServiceBackgroundLocation extends Service
                 @Override
                 public void onKeyEntered(final String key, final GeoLocation location)
                 {
-                    //get date ranges to be in
-                    Date date = new Date();
-                    Calendar queryRangeLow = Calendar.getInstance();
-                    queryRangeLow.setTime(date);
-                    queryRangeLow.add(Calendar.MINUTE, -30);
-
-                    Calendar queryRangeHi = Calendar.getInstance();
-                    queryRangeHi.setTime(date);
-
-                    DateFormat dateFormat = Utils.dateFormat;
-                    String lo = dateFormat.format(queryRangeLow.getTime());
-                    String hi = dateFormat.format(queryRangeHi.getTime());
-
                     final DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("posts").child(key);
-                    dbRef.addListenerForSingleValueEvent(new ValueEventListener()
+                    ValueEventListener postListener = new ValueEventListener()
                     {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot)
@@ -197,7 +186,10 @@ public class ServiceBackgroundLocation extends Service
                                 //add the post if the time is the last 30 mins
                                 if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
                                 {
-                                    createNotification("New pups in your area!");
+                                    //if(!isAppOpen)
+                                        createNotification("New pups in your area!");
+                                    //else
+                                        //System.err.println("App open, not notifying.");
                                 }
                             }
                         }
@@ -206,7 +198,10 @@ public class ServiceBackgroundLocation extends Service
                         public void onCancelled(DatabaseError databaseError)
                         {
                         }
-                    });
+                    };
+                    dbRef.addListenerForSingleValueEvent(postListener);
+
+                    //dbRef.removeEventListener(postListener);
                 }
 
                 @Override
