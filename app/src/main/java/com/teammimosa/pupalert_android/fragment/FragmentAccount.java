@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -33,6 +34,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.teammimosa.pupalert_android.R;
 import com.teammimosa.pupalert_android.util.PupAlertFirebase;
+import com.teammimosa.pupalert_android.util.Utils;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Signs in with google, renders account ui
@@ -129,6 +136,28 @@ public class FragmentAccount extends Fragment implements View.OnClickListener
 
             TextView acct_name = rootView.findViewById(R.id.account_name);
             acct_name.setText(account.getDisplayName());
+
+            final TextView acct_posts = rootView.findViewById(R.id.account_posts);
+
+            //query user key for post total
+            DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("users").child(account.getUid());
+            mRef.addListenerForSingleValueEvent(new ValueEventListener()
+            {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot)
+                {
+                    if(dataSnapshot.exists())
+                    {
+                        PupAlertFirebase.User user = dataSnapshot.getValue(PupAlertFirebase.User.class);
+                        acct_posts.setText("Total Posts: " + user.gettotal_posts());
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError)
+                {
+                }
+            });
 
             ImageView acct_pic = rootView.findViewById(R.id.account_picture_in);
             Glide.with(this).load(account.getPhotoUrl()).into(acct_pic);

@@ -56,12 +56,12 @@
             android:textSize="25dp" />
 
         <TextView
-            android:id="@+id/total_posts"
+            android:id="@+id/account_posts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="350dp"
-            android:text="xxxx total posts" />
+            android:text="Total Posts:   " />
 
         <Button
             android:id="@+id/signout_button"

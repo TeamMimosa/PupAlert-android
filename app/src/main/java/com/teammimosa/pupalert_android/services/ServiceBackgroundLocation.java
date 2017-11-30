@@ -5,12 +5,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -32,19 +32,19 @@ import com.teammimosa.pupalert_android.util.Utils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * This service runs in the background when the app is closed to updated the cur loc every 30 mins or so. Used for checking notifications
+ * @author Domenic Portuesi
  */
 public class ServiceBackgroundLocation extends Service
 {
     private LocationManager mLocationManager = null;
     private Location mLastLocation;
-    private static final int LOCATION_INTERVAL = (1000) * 60 * 30;
-    private static final float LOCATION_DISTANCE = 1000;
+    private static final int LOCATION_INTERVAL = (1000) * 60 * 60;
+    private static final float LOCATION_DISTANCE = 5000;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -52,19 +52,16 @@ public class ServiceBackgroundLocation extends Service
         {
             mLastLocation = new Location(provider);
         }
+        public Location prevLoc = new Location("pupalert");
 
         @Override
         public void onLocationChanged(Location location)
         {
-            Location prevLoc = mLastLocation;
+            //Location prevLoc = mLastLocation;
             mLastLocation.set(location);
             Utils.cachedLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-            //if your location changed
-            if (!mLastLocation.equals(prevLoc))
-            {
-                createFirebaseNotificationListeners();
-            }
+            createFirebaseNotificationListeners();
         }
 
         @Override
@@ -83,7 +80,7 @@ public class ServiceBackgroundLocation extends Service
         }
     }
 
-    LocationListener[] mLocationListeners;
+    LocationListener mLocationListener;
 
     @Override
     public IBinder onBind(Intent arg0)
@@ -102,35 +99,19 @@ public class ServiceBackgroundLocation extends Service
     @Override
     public void onCreate()
     {
-        mLocationListeners = new LocationListener[]{
-                new LocationListener(LocationManager.GPS_PROVIDER),
-                new LocationListener(LocationManager.NETWORK_PROVIDER)
-        };
+        mLocationListener = new LocationListener(LocationManager.NETWORK_PROVIDER);
 
         initializeLocationManager();
         try
         {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
+                    mLocationListener);
         } catch (java.lang.SecurityException ex)
         {
             ex.printStackTrace();
         }
         catch (IllegalArgumentException ex)
-        {
-            ex.printStackTrace();
-        }
-        try
-        {
-            mLocationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[0]);
-        }
-        catch (java.lang.SecurityException ex)
-        {
-            ex.printStackTrace();
-        } catch (IllegalArgumentException ex)
         {
             ex.printStackTrace();
         }
@@ -142,17 +123,7 @@ public class ServiceBackgroundLocation extends Service
         super.onDestroy();
         if (mLocationManager != null)
         {
-            for (int i = 0; i < mLocationListeners.length; i++)
-            {
-                try
-                {
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                }
-                catch (Exception ex)
-                {
-                    ex.printStackTrace();
-                }
-            }
+            mLocationManager.removeUpdates(mLocationListener);
         }
     }
 
@@ -230,8 +201,8 @@ public class ServiceBackgroundLocation extends Service
                                 //add the post if the time is the last 30 mins
                                 if(calTimestamp.after(calTimestampLo) && calTimestamp.before(calTimestampHi))
                                 {
-                                    if(!Utils.isAppRunning(getApplicationContext(), "com.teammimosa.pupalert_android"))
-                                        createNotification("New pups in your area!");
+                                    //if(!VisibilityManager.getIsVisible())
+                                    createNotification("New pups in your area!");
                                 }
                             }
                         }
@@ -282,7 +253,8 @@ public class ServiceBackgroundLocation extends Service
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.mipmap.ic_app)
+                        .setSmallIcon(R.drawable.ic_app_notif)
+                        .setColor(Color.argb(1,255,207,111))
                         .setContentTitle("Pup Alert")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
@@ -294,18 +266,4 @@ public class ServiceBackgroundLocation extends Service
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
-
-    /*
-    private int getNotificationIcon(int entry)
-    {
-        if (entry.targetSdk >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            entry.icon.setColorFilter(mContext.getResources().getColor(android.R.color.white));
-        }
-        else
-        {
-            entry.icon.setColorFilter(null);
-        }
-    }
-    */
 }
