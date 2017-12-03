@@ -1,5 +1,6 @@
 # PupAlert-android
 The social networking app for finding dogs.
+https://teammimosa.github.io/PupAlert-android/
 
 
 ## Building the app
