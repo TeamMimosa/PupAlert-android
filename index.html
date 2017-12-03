@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Pup Alert</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    .card *:not(.darkener) {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .darkener {
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: inherit;
+      flex-direction: inherit;
+      justify-content: inherit;
+    }
+
+    h1 {
+      font-size: 60px;
+      margin: 20px 0 20px 0;
+    }
+
+    #main-header {
+      background: linear-gradient(to left top, #02ffe9, #01bfff);
+      color: white;
+    }
+
+    #main-header img {
+      width: 50%;
+    }
+
+    #find-dogs {
+      background: url("./images/map.png") center/cover no-repeat;
+      height: 300px;
+      color: #ffcf6fff;
+    }
+
+    #post-dogs {
+      background: url("./images/add.png") center/cover no-repeat;
+      height: 300px;
+      color: white;
+    }
+
+    #download {
+      background: linear-gradient(to right top, #01bfff, #02ffe9);
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card" id="main-header">
+    <h1>Pup Alert</h1>
+    <img src="./images/icon.png">
+    <h2>The social network of dog spotting</h2>
+  </div>
+  <div class="card" id="find-dogs">
+    <div class="darkener">
+      <h1>Find pups</h1>
+      <h2>Use the map and list views to find any dogs in your area</h2>
+    </div>
+  </div>
+  <div class="card" id="post-dogs">
+    <div class="darkener">
+      <h1>Post pups</h1>
+      <h2>Post a pup so others can see!</h2>
+    </div>
+  </div>
+  <div class="card" id="download">
+    <h1>Download the app</h1>
+    <h2>Head over to our
+      <a href="https://github.com/teammimosa/pupalert-android/releases/latest">Github releases page</a>
+      to get the latest version.
+    </h2>
+  </div>
+</body>
+
+</html>
