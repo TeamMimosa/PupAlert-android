@@ -15,6 +15,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-around;
+      min-height: 500px;
+      color: white;
     }
 
     .card *:not(.darkener) {
@@ -25,6 +27,7 @@
     }
 
     .darkener {
+      min-height: inherit;
       height: 100%;
       width: 100%;
       background-color: rgba(0, 0, 0, 0.4);
@@ -49,19 +52,15 @@
 
     #find-dogs {
       background: url("./images/map.png") center/cover no-repeat;
-      height: 300px;
-      color: #ffcf6fff;
+
     }
 
     #post-dogs {
       background: url("./images/add.png") center/cover no-repeat;
-      height: 300px;
-      color: white;
     }
 
     #download {
       background: linear-gradient(to right top, #01bfff, #02ffe9);
-      color: white;
     }
   </style>
 </head>
